@@ -6,6 +6,13 @@ import {getMenuElement} from './components/menu';
 import {getRouteInfoElement} from './components/route-info';
 import {getSortElement} from './components/sort';
 
+import {FILTERS} from './const';
+
+import {generateCards} from './mock/card';
+import {generateFilters} from './mock/filter';
+import {generateMenu} from './mock/menu';
+
+
 const CARD_COUNT = 3;
 
 const render = (element, template, position = `beforeend`) => element.insertAdjacentHTML(position, template);
@@ -16,14 +23,18 @@ const filtersTitleElement = document.querySelector(`.trip-controls h2:last-child
 const tripEventsElement = document.querySelector(`.trip-events`);
 
 render(tripInfoElement, getRouteInfoElement(), `afterbegin`);
-render(menuTitleElement, getMenuElement(), `afterend`);
-render(filtersTitleElement, getFiltersElement(), `afterend`);
+
+const menu = generateMenu();
+render(menuTitleElement, getMenuElement(menu), `afterend`);
+
+const filters = generateFilters(FILTERS);
+render(filtersTitleElement, getFiltersElement(filters), `afterend`);
 render(tripEventsElement, getSortElement());
 render(tripEventsElement, getCardListElement());
 
 const cardList = tripEventsElement.querySelector(`.trip-days`);
-render(cardList, getEditCardFormElement());
-render(cardList, getEditCardFormElement());
 
-new Array(CARD_COUNT).fill(``).forEach(() => render(cardList, getCardElement()));
+const cards = generateCards(CARD_COUNT);
+render(cardList, getEditCardFormElement(cards[0]));
+cards.forEach((card) => render(cardList, getCardElement(card)));
 

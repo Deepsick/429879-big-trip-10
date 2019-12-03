@@ -1,20 +1,21 @@
-export const getFiltersElement = () => (
-  `<form class="trip-filters" action="#" method="get">
-    <div class="trip-filters__filter">
-      <input id="filter-everything" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="everything" checked>
-      <label class="trip-filters__filter-label" for="filter-everything">Everything</label>
-    </div>
+const createFilterMarkup = (filter) => {
+  const {title, value, checked} = filter;
 
-    <div class="trip-filters__filter">
-      <input id="filter-future" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="future">
-      <label class="trip-filters__filter-label" for="filter-future">Future</label>
-    </div>
+  return (
+    `<div class="trip-filters__filter">
+      <input id="filter-${value}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${value}" ${checked ? checked : ``}>
+      <label class="trip-filters__filter-label" for="filter-${value}">${title}</label>
+    </div>`
+  );
+};
 
-    <div class="trip-filters__filter">
-      <input id="filter-past" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="past">
-      <label class="trip-filters__filter-label" for="filter-past">Past</label>
-    </div>
+export const getFiltersElement = (filters) => {
+  const tripFilters = filters.map((filter) => createFilterMarkup(filter));
 
-    <button class="visually-hidden" type="submit">Accept filter</button>
-  </form>`
-);
+  return (
+    `<form class="trip-filters" action="#" method="get">
+      ${tripFilters}
+      <button class="visually-hidden" type="submit">Accept filter</button>
+    </form>`
+  );
+};
