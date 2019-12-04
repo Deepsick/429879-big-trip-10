@@ -34,21 +34,27 @@ const OFFERS = [
   `Rent a car`,
 ];
 
+const Price = {
+  MIN: 10,
+  MAX: 200,
+};
+
+const MIN_INDEX = 0;
+let maxIntervalValue;
+
 const getRandomIntervalNumber = (min, max) => {
   return min + Math.floor(Math.random() * max);
 };
 
 const getRandomArrayElement = (array) => {
-  const minIndex = 0;
-  const randomIndex = getRandomIntervalNumber(minIndex, array.length);
+  const randomIndex = getRandomIntervalNumber(MIN_INDEX, array.length);
 
   return array[randomIndex];
 };
 
 const genereateDescription = () => {
-  const minIndex = 0;
-  const maxIntervalValue = 4;
-  let arrayLength = getRandomIntervalNumber(minIndex, maxIntervalValue);
+  maxIntervalValue = 4;
+  let arrayLength = getRandomIntervalNumber(MIN_INDEX, maxIntervalValue);
   const cardDescriptions = new Array(arrayLength)
     .fill(``)
     .map(() => getRandomArrayElement(DESCRIPTIONS));
@@ -63,13 +69,12 @@ const generateDate = (date, hours = 0) => {
 
 const generateOffer = () => ({
   type: getRandomArrayElement(OFFERS),
-  price: getRandomIntervalNumber(10, 200)
+  price: getRandomIntervalNumber(Price.MIN, Price.MAX)
 });
 
 const generateOffers = () => {
-  const minIndex = 0;
-  const maxIntervalValue = 3;
-  let arrayLength = getRandomIntervalNumber(minIndex, maxIntervalValue);
+  maxIntervalValue = 3;
+  let arrayLength = getRandomIntervalNumber(MIN_INDEX, maxIntervalValue);
   const cardOffers = new Array(arrayLength)
     .fill(``)
     .map(() => generateOffer());
