@@ -1,20 +1,14 @@
 import {createElement} from '../utils';
 
-const createRouteInfoTemplate = () => (
-  `<div class="trip-info__main">
-    <h1 class="trip-info__title">Amsterdam &mdash; ... &mdash; Amsterdam</h1>
+const createTripDaysTemplate = () => `<ul class="trip-days"></ul>`;
 
-    <p class="trip-info__dates">Mar 18&nbsp;&mdash;&nbsp;21</p>
-  </div>`
-);
-
-export default class RouteInfo {
+export default class TripDays {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return createRouteInfoTemplate();
+    return createTripDaysTemplate();
   }
 
   getElement() {
@@ -29,4 +23,3 @@ export default class RouteInfo {
     this._element = null;
   }
 }
-

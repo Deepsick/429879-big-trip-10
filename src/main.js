@@ -1,40 +1,85 @@
-import {getCardElement} from './components/card';
-import {getCardListElement} from './components/card-list';
-import {getEditCardFormElement} from './components/edit-card';
-import {getFiltersElement} from './components/filters';
-import {getMenuElement} from './components/menu';
-import {getRouteInfoElement} from './components/route-info';
-import {getSortElement} from './components/sort';
-
+import {render} from './utils';
 import {FILTERS} from './const';
 
-import {generateCards} from './mock/card';
+import EditEventComponent from './components/edit-event';
+import EventComponent from './components/event';
+import EventsComponent from './components/events';
+import FiltersComponent from './components/filters';
+import MenuComponent from './components/menu';
+import RouteInfoComponent from './components/route-info';
+import SortComponent from './components/sort';
+import TripDayComponent from './components/trip-day';
+import TripDaysComponent from './components/trip-days';
+
+import {generateEvents} from './mock/event';
 import {generateFilters} from './mock/filter';
 import {generateMenu} from './mock/menu';
+import {generateTripDays} from './mock/trip-day';
 
 
-const CARD_COUNT = 3;
+const TRIP_DAY_COUNT = 2;
+const ESCAPE_NAMES = [`Escape`, `Esc`];
 
-const render = (element, template, position = `beforeend`) => element.insertAdjacentHTML(position, template);
+const renderEvent = (eventListElement, event) => {
+  const onEscKeyDown = (evt) => {
+    const isEscKey = ESCAPE_NAMES.includes(evt.key);
+
+    if (isEscKey) {
+      replaceEditToEvent();
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
+  };
+
+  const replaceEditToEvent = () => {
+    eventListElement.replaceChild(eventComponent.getElement(), editEventComponent.getElement());
+  };
+
+  const replaceEventToEdit = () => {
+    eventListElement.replaceChild(editEventComponent.getElement(), eventComponent.getElement());
+  };
+
+  const eventComponent = new EventComponent(event);
+  const editButton = eventComponent.getElement().querySelector(`.event__rollup-btn`);
+
+  editButton.addEventListener(`click`, () => {
+    replaceEventToEdit();
+    document.addEventListener(`keydown`, onEscKeyDown);
+  });
+
+  const editEventComponent = new EditEventComponent(event);
+
+  editEventComponent.getElement().addEventListener(`submit`, replaceEditToEvent);
+
+  render(eventListElement, eventComponent.getElement());
+};
+
+const renderTripDay = (tripDayListElement, tripDay) => {
+  const {eventsCount} = tripDay;
+  const tripDayComponent = new TripDayComponent(tripDay);
+  const eventsComponent = new EventsComponent();
+  const events = generateEvents(eventsCount);
+  events.forEach((event) => renderEvent(eventsComponent.getElement(), event));
+
+  render(tripDayComponent.getElement(), eventsComponent.getElement());
+  render(tripDayListElement, tripDayComponent.getElement());
+};
 
 const tripInfoElement = document.querySelector(`.trip-info`);
 const menuTitleElement = document.querySelector(`.trip-controls h2:first-child`);
 const filtersTitleElement = document.querySelector(`.trip-controls h2:last-child`);
 const tripEventsElement = document.querySelector(`.trip-events`);
 
-render(tripInfoElement, getRouteInfoElement(), `afterbegin`);
+render(tripInfoElement, new RouteInfoComponent().getElement(), `afterbegin`);
 
 const menu = generateMenu();
-render(menuTitleElement, getMenuElement(menu), `afterend`);
+render(menuTitleElement, new MenuComponent(menu).getElement(), `afterend`);
 
 const filters = generateFilters(FILTERS);
-render(filtersTitleElement, getFiltersElement(filters), `afterend`);
-render(tripEventsElement, getSortElement());
-render(tripEventsElement, getCardListElement());
+render(filtersTitleElement, new FiltersComponent(filters).getElement(), `afterend`);
+render(tripEventsElement, new SortComponent().getElement());
+const tripDaysComponent = new TripDaysComponent();
+render(tripEventsElement, tripDaysComponent.getElement());
 
-const cardList = tripEventsElement.querySelector(`.trip-days`);
-
-const cards = generateCards(CARD_COUNT);
-render(cardList, getEditCardFormElement(cards[0]));
-cards.forEach((card) => render(cardList, getCardElement(card)));
+const tripDays = generateTripDays(TRIP_DAY_COUNT);
+tripDays.forEach((tripDay) => renderTripDay(tripDaysComponent.getElement(), tripDay));
 
