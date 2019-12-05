@@ -1,8 +1,4 @@
-const RenderPosition = {
-  BEFOREEND: `beforeend`,
-  AFTERBEGIN: `afterbegin`,
-  AFTEREND: `afterend`,
-};
+const MIN_ARRAY_INDEX = 0;
 
 const MONTHS = [
   `January`,
@@ -18,6 +14,12 @@ const MONTHS = [
   `November`,
   `December`,
 ];
+
+const RenderPosition = {
+  BEFOREEND: `beforeend`,
+  AFTERBEGIN: `afterbegin`,
+  AFTEREND: `afterend`,
+};
 
 export const formatDateToICO = (date) => {
   return date.toISOString();
@@ -57,7 +59,6 @@ export const getRandomIntervalNumber = (min, max) => {
   return min + Math.floor(Math.random() * max);
 };
 
-const MIN_ARRAY_INDEX = 0;
 export const getRandomArrayElement = (array) => {
   const randomIndex = getRandomIntervalNumber(MIN_ARRAY_INDEX, array.length);
 
