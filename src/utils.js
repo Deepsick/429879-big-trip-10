@@ -15,6 +15,8 @@ const MONTHS = [
   `December`,
 ];
 
+const ESCAPE_NAMES = [`Escape`, `Esc`];
+
 const RenderPosition = {
   BEFOREEND: `beforeend`,
   AFTERBEGIN: `afterbegin`,
@@ -58,6 +60,8 @@ export const createElement = (template) => {
 export const getRandomIntervalNumber = (min, max) => {
   return min + Math.floor(Math.random() * max);
 };
+
+export const isEscKey = (key) => ESCAPE_NAMES.includes(key);
 
 export const getRandomArrayElement = (array) => {
   const randomIndex = getRandomIntervalNumber(MIN_ARRAY_INDEX, array.length);

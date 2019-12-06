@@ -1,9 +1,8 @@
-import {render} from './utils';
+import {render, isEscKey} from './utils';
 import {FILTERS} from './const';
 
 import EditEventComponent from './components/edit-event';
 import EventComponent from './components/event';
-import EventsComponent from './components/events';
 import FiltersComponent from './components/filters';
 import MenuComponent from './components/menu';
 import RouteInfoComponent from './components/route-info';
@@ -18,13 +17,12 @@ import {generateTripDays} from './mock/trip-day';
 
 
 const TRIP_DAY_COUNT = 2;
-const ESCAPE_NAMES = [`Escape`, `Esc`];
+
 
 const renderEvent = (eventListElement, event) => {
   const onEscKeyDown = (evt) => {
-    const isEscKey = ESCAPE_NAMES.includes(evt.key);
 
-    if (isEscKey) {
+    if (isEscKey(evt.key)) {
       replaceEditToEvent();
       document.removeEventListener(`keydown`, onEscKeyDown);
     }
@@ -56,11 +54,10 @@ const renderEvent = (eventListElement, event) => {
 const renderTripDay = (tripDayListElement, tripDay) => {
   const {eventsCount} = tripDay;
   const tripDayComponent = new TripDayComponent(tripDay);
-  const eventsComponent = new EventsComponent();
+  const eventListElement = tripDayComponent.getElement().querySelector('.trip-events__list');
   const events = generateEvents(eventsCount);
-  events.forEach((event) => renderEvent(eventsComponent.getElement(), event));
+  events.forEach((event) => renderEvent(eventListElement, event));
 
-  render(tripDayComponent.getElement(), eventsComponent.getElement());
   render(tripDayListElement, tripDayComponent.getElement());
 };
 

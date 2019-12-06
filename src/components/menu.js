@@ -7,7 +7,7 @@ const createTabTemplate = (menuItem) => {
 };
 
 const createMenuTemplate = (tabs) => {
-  const menu = tabs.map((tab) => createTabTemplate(tab));
+  const menu = tabs.map((tab) => createTabTemplate(tab)).join(``);
   return (
     `<nav class="trip-controls__trip-tabs  trip-tabs">
       ${menu}

@@ -16,7 +16,7 @@ const generateOffersMarkup = (offers) => {
 
 const createEventTemplate = (event) => {
   const {type, description, startTime, endTime, price, duration, offers} = event;
-  const offersMarkup = generateOffersMarkup(offers);
+  const offersMarkup = generateOffersMarkup(offers).join(``);
 
   return `<li class="trip-events__item">
     <div class="event">
