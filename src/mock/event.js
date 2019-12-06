@@ -1,3 +1,5 @@
+import {getRandomArrayElement, getRandomIntervalNumber} from '../utils';
+
 const TYPES = [
   `taxi`,
   `bus`,
@@ -42,24 +44,14 @@ const Price = {
 const MIN_INDEX = 0;
 let maxIntervalValue;
 
-const getRandomIntervalNumber = (min, max) => {
-  return min + Math.floor(Math.random() * max);
-};
-
-const getRandomArrayElement = (array) => {
-  const randomIndex = getRandomIntervalNumber(MIN_INDEX, array.length);
-
-  return array[randomIndex];
-};
-
 const genereateDescription = () => {
   maxIntervalValue = 4;
   let arrayLength = getRandomIntervalNumber(MIN_INDEX, maxIntervalValue);
-  const cardDescriptions = new Array(arrayLength)
+  const eventDescriptions = new Array(arrayLength)
     .fill(``)
     .map(() => getRandomArrayElement(DESCRIPTIONS));
 
-  return cardDescriptions.join(` `);
+  return eventDescriptions.join(` `);
 };
 
 const generateDate = (date, hours = 0) => {
@@ -75,14 +67,14 @@ const generateOffer = () => ({
 const generateOffers = () => {
   maxIntervalValue = 3;
   let arrayLength = getRandomIntervalNumber(MIN_INDEX, maxIntervalValue);
-  const cardOffers = new Array(arrayLength)
+  const eventOffers = new Array(arrayLength)
     .fill(``)
     .map(() => generateOffer());
 
-  return cardOffers;
+  return eventOffers;
 };
 
-const generateCard = () => {
+const generateEvent = () => {
   const now = new Date();
   const randomHours = getRandomIntervalNumber(1, 13);
 
@@ -100,10 +92,10 @@ const generateCard = () => {
 };
 
 
-const generateCards = (amount) => {
+const generateEvents = (amount) => {
   return new Array(amount)
-  .fill(``)
-  .map(generateCard);
+    .fill(``)
+    .map(generateEvent);
 };
 
-export {generateCard, generateCards};
+export {generateEvents};

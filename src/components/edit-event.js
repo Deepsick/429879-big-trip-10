@@ -1,6 +1,6 @@
-import {formatEditDate} from '../utils';
+import {getFullDate, createElement} from '../utils';
 
-export const getEditCardFormElement = ({type, city, photo, description, startTime, endTime, price}) => {
+export const createEditEventTemplate = ({type, city, photo, description, startTime, endTime, price}) => {
   return `<form class="event  event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
@@ -87,12 +87,12 @@ export const getEditCardFormElement = ({type, city, photo, description, startTim
         <label class="visually-hidden" for="event-start-time-1">
           From
         </label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatEditDate(startTime)}">
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getFullDate(startTime)}">
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">
           To
         </label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatEditDate(endTime)}">
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getFullDate(endTime)}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -186,3 +186,26 @@ export const getEditCardFormElement = ({type, city, photo, description, startTim
     </section>
   </form>`;
 };
+
+export default class EditEvent {
+  constructor(event) {
+    this._event = event;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEditEventTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
