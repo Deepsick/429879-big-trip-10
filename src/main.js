@@ -9,6 +9,7 @@ import RouteInfoComponent from './components/route-info';
 import SortComponent from './components/sort';
 import TripDayComponent from './components/trip-day';
 import TripDaysComponent from './components/trip-days';
+import NoTripDaysComponent from './components/no-trip-days';
 
 import {generateEvents} from './mock/event';
 import {generateFilters} from './mock/filter';
@@ -73,10 +74,15 @@ render(menuTitleElement, new MenuComponent(menu).getElement(), `afterend`);
 
 const filters = generateFilters(FILTERS);
 render(filtersTitleElement, new FiltersComponent(filters).getElement(), `afterend`);
-render(tripEventsElement, new SortComponent().getElement());
-const tripDaysComponent = new TripDaysComponent();
-render(tripEventsElement, tripDaysComponent.getElement());
 
 const tripDays = generateTripDays(TRIP_DAY_COUNT);
-tripDays.forEach((tripDay) => renderTripDay(tripDaysComponent.getElement(), tripDay));
+if (tripDays.length) {
+  render(tripEventsElement, new SortComponent().getElement());
+  const tripDaysComponent = new TripDaysComponent();
+  render(tripEventsElement, tripDaysComponent.getElement());
+  tripDays.forEach((tripDay) => renderTripDay(tripDaysComponent.getElement(), tripDay));
+} else {
+  render(tripEventsElement, new NoTripDaysComponent().getElement());
+}
+
 
