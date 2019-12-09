@@ -1,4 +1,5 @@
-import {createElement, formatDateToDay, formatDateToICO} from '../utils';
+import AbstractComponent from './abstract-component';
+import {formatDateToDay, formatDateToICO} from '../utils/common';
 
 const createTripDayTemplate = (tripDay) => {
   const {day, date} = tripDay;
@@ -12,25 +13,13 @@ const createTripDayTemplate = (tripDay) => {
   </li>`;
 };
 
-export default class TripDay {
+export default class TripDay extends AbstractComponent {
   constructor(tripDay) {
-    this._element = null;
+    super();
     this._tripDay = tripDay;
   }
 
   getTemplate() {
     return createTripDayTemplate(this._tripDay);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

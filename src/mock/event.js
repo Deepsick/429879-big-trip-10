@@ -1,4 +1,4 @@
-import {getRandomArrayElement, getRandomIntervalNumber} from '../utils';
+import {getRandomArrayElement, getRandomIntervalNumber} from '../utils/common';
 
 const TYPES = [
   `taxi`,

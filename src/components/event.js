@@ -1,4 +1,5 @@
-import {formatDateToTime, formatDateToICO, createElement} from '../utils';
+import AbstractComponent from './abstract-component';
+import {formatDateToTime, formatDateToICO} from '../utils/common';
 
 const generateOffersMarkup = (offers) => {
   return offers.map((offer) => {
@@ -49,25 +50,20 @@ const createEventTemplate = (event) => {
   </li>`;
 };
 
-export default class Event {
+export default class Event extends AbstractComponent {
   constructor(event) {
+    super();
     this._event = event;
-    this._element = null;
   }
 
   getTemplate() {
     return createEventTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setEditButtonClickHandler(handler) {
+    this
+      .getElement()
+      .querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, handler);
   }
 }

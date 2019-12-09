@@ -1,4 +1,5 @@
-import {getFullDate, createElement} from '../utils';
+import AbstractComponent from './abstract-component';
+import {getFullDate} from '../utils/common';
 
 export const createEditEventTemplate = ({type, city, photo, description, startTime, endTime, price}) => {
   return `<form class="event  event--edit" action="#" method="post">
@@ -187,25 +188,19 @@ export const createEditEventTemplate = ({type, city, photo, description, startTi
   </form>`;
 };
 
-export default class EditEvent {
+export default class EditEvent extends AbstractComponent {
   constructor(event) {
+    super();
     this._event = event;
-    this._element = null;
   }
 
   getTemplate() {
     return createEditEventTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setSubmitHandler(handler) {
+    this
+    .getElement()
+    .addEventListener(`submit`, handler);
   }
 }
