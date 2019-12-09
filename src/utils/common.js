@@ -1,27 +1,6 @@
+import {MONTHS, ESCAPE_NAMES} from '../const';
+
 const MIN_ARRAY_INDEX = 0;
-
-const MONTHS = [
-  `January`,
-  `February`,
-  `March`,
-  `April`,
-  `May`,
-  `June`,
-  `July`,
-  `August`,
-  `September`,
-  `October`,
-  `November`,
-  `December`,
-];
-
-const ESCAPE_NAMES = [`Escape`, `Esc`];
-
-const RenderPosition = {
-  BEFOREEND: `beforeend`,
-  AFTERBEGIN: `afterbegin`,
-  AFTEREND: `afterend`,
-};
 
 export const formatDateToICO = (date) => {
   return date.toISOString();
@@ -50,13 +29,6 @@ export const formatToTitleCase = (word) => {
   return `${firstLetter}${word.slice(1)}`;
 };
 
-export const createElement = (template) => {
-  const container = document.createElement(`div`);
-  container.innerHTML = template;
-
-  return container.firstChild;
-};
-
 export const getRandomIntervalNumber = (min, max) => {
   return min + Math.floor(Math.random() * max);
 };
@@ -68,18 +40,3 @@ export const getRandomArrayElement = (array) => {
 
   return array[randomIndex];
 };
-
-export const render = (node, element, place = RenderPosition.BEFOREEND) => {
-  switch (place) {
-    case RenderPosition.AFTERBEGIN:
-      node.prepend(element);
-      break;
-    case RenderPosition.BEFOREEND:
-      node.append(element);
-      break;
-    case RenderPosition.AFTEREND:
-      node.after(element);
-      break;
-  }
-};
-

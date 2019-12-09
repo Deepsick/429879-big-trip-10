@@ -1,4 +1,4 @@
-import {formatToTitleCase} from '../utils';
+import {formatToTitleCase} from '../utils/common';
 
 const generateFilter = (name) => ({
   title: formatToTitleCase(name),

@@ -1,4 +1,4 @@
-import {getRandomIntervalNumber} from '../utils';
+import {getRandomIntervalNumber} from '../utils/common';
 
 
 const Day = {
