@@ -1,9 +1,10 @@
 import {render, replace} from '../utils/render';
 import {isEscKey} from '../utils/common';
+import {HOUR_SIGN} from '../const';
 
 import EditEventComponent from '../components/edit-event';
 import EventComponent from '../components/event';
-import SortComponent from '../components/sort';
+import SortComponent, {SortType} from '../components/sort';
 import TripDayComponent from '../components/trip-day';
 import TripDaysComponent from '../components/trip-days';
 import NoTripDaysComponent from '../components/no-trip-days';
@@ -39,15 +40,21 @@ const renderEvent = (eventListElement, event) => {
   render(eventListElement, eventComponent);
 };
 
-const renderTripDay = (tripDayListElement, tripDay) => {
+const generateTripEvents = (tripDay) => {
   const {eventsCount} = tripDay;
+  const events = generateEvents(eventsCount);
+
+  return events;
+};
+
+const renderTripDay = (tripDayListElement, tripDay, events) => {
   const tripDayComponent = new TripDayComponent(tripDay);
   const eventListElement = tripDayComponent.getElement().querySelector(`.trip-events__list`);
-  const events = generateEvents(eventsCount);
   events.forEach((event) => renderEvent(eventListElement, event));
 
   render(tripDayListElement, tripDayComponent);
 };
+
 
 export default class TripController {
   constructor(container) {
@@ -64,8 +71,38 @@ export default class TripController {
       return;
     }
 
-    tripDays.forEach((tripDay) => renderTripDay(this._tripDaysComponent.getElement(), tripDay));
+    let allEvents = [];
+    tripDays.forEach((tripDay) => {
+      const events = generateTripEvents(tripDay);
+      tripDay.events = events;
+      allEvents = [...allEvents, ...events];
+      renderTripDay(this._tripDaysComponent.getElement(), tripDay, events);
+    });
+
     render(this._container, this._sortComponent);
     render(this._container, this._tripDaysComponent);
+
+    this._sortComponent.setSortTypeHandler((sortType) => {
+      let sortedEvents = [];
+
+      this._tripDaysComponent.getElement().innerHTML = ``;
+      switch (sortType) {
+        case SortType.EVENT:
+          tripDays.forEach((tripDay) => {
+            renderTripDay(this._tripDaysComponent.getElement(), tripDay, tripDay.events);
+          });
+          return;
+        case SortType.TIME:
+          sortedEvents = [...allEvents].sort((left, right) => +right.duration.replace(HOUR_SIGN, ``) - +left.duration.replace(HOUR_SIGN, ``));
+          break;
+        case SortType.PRICE:
+          sortedEvents = [...allEvents].sort((left, right) => right.price - left.price);
+          break;
+      }
+
+      this._tripDaysComponent.getElement().innerHTML = ``;
+      renderTripDay(this._tripDaysComponent.getElement(), tripDays[0], sortedEvents);
+      this._tripDaysComponent.getElement().querySelector(`.day__info`).innerHTML = ``;
+    });
   }
 }

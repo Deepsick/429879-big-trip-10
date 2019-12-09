@@ -1,5 +1,13 @@
 import AbstractComponent from './abstract-component';
 
+export const SortType = {
+  EVENT: `sort-event`,
+  TIME: `sort-time`,
+  PRICE: `sort-price`,
+};
+
+const LABEL_TAG_NAME = `label`;
+
 const createSortTemplate = () => (
   `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
     <span class="trip-sort__item  trip-sort__item--day">Day</span>
@@ -34,7 +42,32 @@ const createSortTemplate = () => (
 );
 
 export default class Sort extends AbstractComponent {
+  constructor() {
+    super();
+    this._currentSortType = SortType.EVENT;
+  }
+
   getTemplate() {
     return createSortTemplate();
+  }
+
+  setSortTypeHandler(handler) {
+    this.getElement().addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+
+      const currentTarget = evt.target;
+      if (currentTarget.tagName.toLowerCase() !== LABEL_TAG_NAME) {
+        return;
+      }
+
+      const sortType = currentTarget.htmlFor;
+
+      if (sortType === this._currentSortType) {
+        return;
+      }
+
+      this._currentSortType = sortType;
+      handler(sortType);
+    });
   }
 }
