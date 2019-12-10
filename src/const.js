@@ -16,3 +16,5 @@ export const MONTHS = [
 ];
 
 export const ESCAPE_NAMES = [`Escape`, `Esc`];
+
+export const HOUR_SIGN = `H`;
