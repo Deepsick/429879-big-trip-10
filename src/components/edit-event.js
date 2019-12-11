@@ -1,7 +1,23 @@
-import AbstractComponent from './abstract-component';
+import AbstractSmartComponent from './abstract-smart-component';
 import {getFullDate} from '../utils/common';
 
-export const createEditEventTemplate = ({type, city, photo, description, startTime, endTime, price}) => {
+const createoffersMarkup = (offers) => {
+  return offers.map((offer) => {
+    const {type, price} = offer;
+    return (
+      `<div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${type}-1" type="checkbox" name="event-offer-${type}" checked>
+        <label class="event__offer-label" for="event-offer-${type}-1">
+          <span class="event__offer-title">${type}</span>
+          &plus;
+          &euro;&nbsp;<span class="event__offer-price">${price}</span>
+        </label>
+      </div>`
+    );
+  });
+};
+
+export const createEditEventTemplate = ({type, city, photo, description, startTime, endTime, price, isFavorite, offers}) => {
   return `<form class="event  event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
@@ -107,7 +123,7 @@ export const createEditEventTemplate = ({type, city, photo, description, startTi
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
       <button class="event__reset-btn" type="reset">Delete</button>
 
-      <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" checked>
+      <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
       <label class="event__favorite-btn" for="event-favorite-1">
         <span class="visually-hidden">Add to favorite</span>
         <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -126,50 +142,7 @@ export const createEditEventTemplate = ({type, city, photo, description, startTi
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
         <div class="event__available-offers">
-          <div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" checked>
-            <label class="event__offer-label" for="event-offer-luggage-1">
-              <span class="event__offer-title">Add luggage</span>
-              &plus;
-              &euro;&nbsp;<span class="event__offer-price">30</span>
-            </label>
-          </div>
-
-          <div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-1" type="checkbox" name="event-offer-comfort" checked>
-            <label class="event__offer-label" for="event-offer-comfort-1">
-              <span class="event__offer-title">Switch to comfort class</span>
-              &plus;
-              &euro;&nbsp;<span class="event__offer-price">100</span>
-            </label>
-          </div>
-
-          <div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-meal-1" type="checkbox" name="event-offer-meal">
-            <label class="event__offer-label" for="event-offer-meal-1">
-              <span class="event__offer-title">Add meal</span>
-              &plus;
-              &euro;&nbsp;<span class="event__offer-price">15</span>
-            </label>
-          </div>
-
-          <div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-seats-1" type="checkbox" name="event-offer-seats">
-            <label class="event__offer-label" for="event-offer-seats-1">
-              <span class="event__offer-title">Choose seats</span>
-              &plus;
-              &euro;&nbsp;<span class="event__offer-price">5</span>
-            </label>
-          </div>
-
-          <div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-train-1" type="checkbox" name="event-offer-train">
-            <label class="event__offer-label" for="event-offer-train-1">
-              <span class="event__offer-title">Travel by train</span>
-              &plus;
-              &euro;&nbsp;<span class="event__offer-price">40</span>
-            </label>
-          </div>
+          ${createoffersMarkup(offers).join(``)}
         </div>
       </section>
 
@@ -188,7 +161,7 @@ export const createEditEventTemplate = ({type, city, photo, description, startTi
   </form>`;
 };
 
-export default class EditEvent extends AbstractComponent {
+export default class EditEvent extends AbstractSmartComponent {
   constructor(event) {
     super();
     this._event = event;
@@ -202,5 +175,34 @@ export default class EditEvent extends AbstractComponent {
     this
     .getElement()
     .addEventListener(`submit`, handler);
+  }
+
+  setFavoriteButtonClickHandler(handler) {
+    this
+      .getElement()
+      .querySelector(`.event__favorite-btn`)
+      .addEventListener(`click`, handler);
+  }
+
+  recoveryListeners() {
+
+  }
+
+  reset() {
+    this.rerender();
+  }
+
+  setTypeChangeHandler(handler) {
+    this
+      .getElement()
+      .querySelector(`.event__type-list`)
+      .addEventListener(`change`, handler);
+  }
+
+  setDestinationInputChangeHandler(handler) {
+    this
+      .getElement()
+      .querySelector(`.event__input--destination`)
+      .addEventListener(`change`, handler);
   }
 }

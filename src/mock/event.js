@@ -44,7 +44,7 @@ const Price = {
 const MIN_INDEX = 0;
 let maxIntervalValue;
 
-const genereateDescription = () => {
+export const genereateDescription = () => {
   maxIntervalValue = 4;
   let arrayLength = getRandomIntervalNumber(MIN_INDEX, maxIntervalValue);
   const eventDescriptions = new Array(arrayLength)
@@ -64,7 +64,7 @@ const generateOffer = () => ({
   price: getRandomIntervalNumber(Price.MIN, Price.MAX)
 });
 
-const generateOffers = () => {
+export const generateOffers = () => {
   maxIntervalValue = 3;
   let arrayLength = getRandomIntervalNumber(MIN_INDEX, maxIntervalValue);
   const eventOffers = new Array(arrayLength)
@@ -79,6 +79,7 @@ const generateEvent = () => {
   const randomHours = getRandomIntervalNumber(1, 13);
 
   return {
+    id: getRandomIntervalNumber(0, 10000),
     type: getRandomArrayElement(TYPES),
     city: getRandomArrayElement(CITIES),
     photo: `http://picsum.photos/300/150?r=${Math.random()}`,
@@ -87,7 +88,8 @@ const generateEvent = () => {
     endTime: generateDate(now, randomHours),
     duration: `${randomHours}H`,
     price: getRandomIntervalNumber(10, 300),
-    offers: generateOffers()
+    offers: generateOffers(),
+    isFavorite: false,
   };
 };
 

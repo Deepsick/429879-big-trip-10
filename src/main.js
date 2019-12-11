@@ -1,10 +1,10 @@
-import {render} from './utils/render';
+import {render, RenderPosition} from './utils/render';
 import {FILTERS} from './const';
 
 import FiltersComponent from './components/filters';
 import MenuComponent from './components/menu';
 import RouteInfoComponent from './components/route-info';
-import TripController from './controllers/TripController';
+import TripController from './controllers/trip';
 
 import {generateFilters} from './mock/filter';
 import {generateMenu} from './mock/menu';
@@ -18,13 +18,13 @@ const menuTitleElement = document.querySelector(`.trip-controls h2:first-child`)
 const filtersTitleElement = document.querySelector(`.trip-controls h2:last-child`);
 const tripEventsElement = document.querySelector(`.trip-events`);
 
-render(tripInfoElement, new RouteInfoComponent(), `afterbegin`);
+render(tripInfoElement, new RouteInfoComponent(), RenderPosition.AFTERBEGIN);
 
 const menu = generateMenu();
-render(menuTitleElement, new MenuComponent(menu), `afterend`);
+render(menuTitleElement, new MenuComponent(menu), RenderPosition.AFTEREND);
 
 const filters = generateFilters(FILTERS);
-render(filtersTitleElement, new FiltersComponent(filters), `afterend`);
+render(filtersTitleElement, new FiltersComponent(filters), RenderPosition.AFTEREND);
 
 const tripDays = generateTripDays(TRIP_DAY_COUNT);
 const tripController = new TripController(tripEventsElement);
