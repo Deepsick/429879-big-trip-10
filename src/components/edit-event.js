@@ -184,10 +184,6 @@ export default class EditEvent extends AbstractSmartComponent {
       .addEventListener(`click`, handler);
   }
 
-  recoveryListeners() {
-
-  }
-
   reset() {
     this.rerender();
   }

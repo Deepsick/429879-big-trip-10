@@ -16,7 +16,7 @@ export default class PointController {
     this._container = container;
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
-    this._mode = Mode.DEFAULT; 
+    this._mode = Mode.DEFAULT;
 
     this._eventComponent = null;
     this._editEventComponent = null;
@@ -39,7 +39,11 @@ export default class PointController {
       evt.preventDefault();
       this._replaceEditToEvent();
     });
-    this._editEventComponent.setFavoriteButtonClickHandler(() => this._onDataChange(this, point, {...point, isFavorite: !point.isFavorite}));
+    this._editEventComponent.setFavoriteButtonClickHandler(() => this._onDataChange(
+        this,
+        point,
+        Object.assign({}, point, {isFavorite: !point.isFavorite})
+    ));
 
 
     this._editEventComponent.setTypeChangeHandler(() => {
@@ -48,10 +52,14 @@ export default class PointController {
         .querySelector(`.event__type-input:checked`)
         .value;
       const offers = generateOffers();
-      this._onDataChange(this, point, {...point, type, offers});
+      this._onDataChange(this, point, Object.assign({}, point, {type, offers}));
     });
 
-    this._editEventComponent.setDestinationInputChangeHandler(() => this._onDataChange(this, point, {...point, description: genereateDescription()}));
+    this._editEventComponent.setDestinationInputChangeHandler(() => this._onDataChange(
+        this,
+        point,
+        Object.assign({}, point, {description: genereateDescription()})
+    ));
 
     if (oldEventComponent && oldEditEventComponent) {
       replace(this._eventComponent, oldEventComponent);
