@@ -1,4 +1,4 @@
-const RenderPosition = {
+export const RenderPosition = {
   BEFOREEND: `beforeend`,
   AFTERBEGIN: `afterbegin`,
   AFTEREND: `afterend`,
