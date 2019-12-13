@@ -1,5 +1,5 @@
 import AbstractComponent from './abstract-component';
-import {formatDateToTime, formatDateToICO} from '../utils/common';
+import {formatTime, formatDate, formatDuration} from '../utils/common';
 
 const generateOffersMarkup = (offers) => {
   return offers.map((offer) => {
@@ -16,7 +16,7 @@ const generateOffersMarkup = (offers) => {
 
 
 const createEventTemplate = (event) => {
-  const {type, description, startTime, endTime, price, duration, offers} = event;
+  const {type, description, startTime, endTime, price, offers} = event;
   const offersMarkup = generateOffersMarkup(offers).join(``);
 
   return `<li class="trip-events__item">
@@ -28,11 +28,11 @@ const createEventTemplate = (event) => {
 
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="${formatDateToICO(startTime)}">${formatDateToTime(startTime)}</time>
+          <time class="event__start-time" datetime="${formatDate(startTime)}">${formatTime(startTime)}</time>
           &mdash;
-          <time class="event__end-time" datetime="${formatDateToICO(endTime)}">${formatDateToTime(endTime)}</time>
+          <time class="event__end-time" datetime="${formatDate(endTime)}">${formatTime(endTime)}</time>
         </p>
-        <p class="event__duration">${duration}</p>
+        <p class="event__duration">${formatDuration(startTime, endTime)}</p>
       </div>
 
       <p class="event__price">

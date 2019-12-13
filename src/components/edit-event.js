@@ -1,5 +1,8 @@
+import flatpickr from 'flatpickr';
+
+import 'flatpickr/dist/flatpickr.css';
+
 import AbstractSmartComponent from './abstract-smart-component';
-import {getFullDate} from '../utils/common';
 
 const createoffersMarkup = (offers) => {
   return offers.map((offer) => {
@@ -104,12 +107,12 @@ export const createEditEventTemplate = ({type, city, photo, description, startTi
         <label class="visually-hidden" for="event-start-time-1">
           From
         </label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getFullDate(startTime)}">
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${startTime}">
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">
           To
         </label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getFullDate(endTime)}">
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${endTime}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -165,6 +168,9 @@ export default class EditEvent extends AbstractSmartComponent {
   constructor(event) {
     super();
     this._event = event;
+    this._flatpickrs = [];
+
+    this._applyFlatpickrs();
   }
 
   getTemplate() {
@@ -186,6 +192,22 @@ export default class EditEvent extends AbstractSmartComponent {
 
   reset() {
     this.rerender();
+  }
+
+  _applyFlatpickrs() {
+    if (this._flatpickrs.length) {
+      this._flatpickrs.forEach((calendar) => calendar.destroy());
+      this._flatpickrs = null;
+    }
+
+    const timeElements = Array.from(this.getElement().querySelectorAll(`.event__input--time`));
+    timeElements.forEach((dateElement) => {
+      this._flatpickrs.push(flatpickr(dateElement, {
+        allowInput: true,
+        defaultDate: dateElement.id.includes(`event-end-time`) ? this._event.endTime : this._event.startTime,
+        dateFormat: `d/m/Y H:i`,
+      }));
+    });
   }
 
   setTypeChangeHandler(handler) {
