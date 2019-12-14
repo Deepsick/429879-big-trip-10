@@ -18,7 +18,6 @@ const addZeroToTime = (time) => {
 };
 
 export const formatDuration = (startDate, endDate) => {
-  const HOUR = 1;
   const mseconds = moment(endDate).diff(moment(startDate));
   let minutes = Math.floor(mseconds / TimeRatio.SECOND_IN_MILLISECONDS / TimeRatio.MINUTES_IN_HOUR);
   const days = Math.floor(minutes / TimeRatio.MINUTES_IN_HOUR / TimeRatio.HOURS_IN_DAY);
@@ -29,7 +28,7 @@ export const formatDuration = (startDate, endDate) => {
     return `${addZeroToTime(days)}D ${addZeroToTime(hours)}H ${addZeroToTime(minutes)}M`;
   }
 
-  if (hours < HOUR) {
+  if (hours < TimeRatio.HOUR) {
     return `${addZeroToTime(minutes)}M`;
   }
 

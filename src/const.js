@@ -17,6 +17,7 @@ export const MONTHS = [
 
 export const TimeRatio = {
   DOUBLE_DIGIT: 10,
+  HOUR: 1,
   SECOND_IN_MILLISECONDS: 1000,
   HOURS_IN_DAY: 24,
   MINUTES_IN_HOUR: 60,
