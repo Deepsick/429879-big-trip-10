@@ -1,5 +1,5 @@
 import AbstractComponent from './abstract-component';
-import {formatDateToDay, formatDateToICO} from '../utils/common';
+import {formatTime, formatDate} from '../utils/common';
 
 const createTripDayTemplate = (tripDay) => {
   const {day, date} = tripDay;
@@ -7,7 +7,7 @@ const createTripDayTemplate = (tripDay) => {
   return `<li class="trip-days__item  day">
     <div class="day__info">
       <span class="day__counter">${day}</span>
-      <time class="day__date" datetime="${formatDateToICO(date)}">${formatDateToDay(date)}</time>
+      <time class="day__date" datetime="${formatDate(date)}">${formatTime(date)}</time>
     </div>
     <ul class="trip-events__list"></ul>
   </li>`;

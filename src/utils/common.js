@@ -1,19 +1,42 @@
-import {MONTHS, ESCAPE_NAMES} from '../const';
+import moment from 'moment';
+
+
+import {MONTHS, ESCAPE_NAMES, TimeRatio} from '../const';
 
 const MIN_ARRAY_INDEX = 0;
 
-export const formatDateToICO = (date) => {
-  return date.toISOString();
+export const formatDate = (date) => {
+  return moment(date).format(`DD/MM/YYYY hh:mm`);
 };
 
-export const formatDateToTime = (date) => {
-  const hours = date.getHours() > 9 ? date.getHours() : `0${date.getHours()}`;
-  const minutes = date.getMinutes() > 9 ? date.getMinutes() : `0${date.getMinutes()}`;
-  return `${hours}:${minutes}`;
+export const formatTime = (date) => {
+  return moment(date).format(`hh:mm`);
+};
+
+const addZeroToTime = (time) => {
+  return `${time < TimeRatio.DOUBLE_DIGIT ? `0` + time : time}`;
+};
+
+export const formatDuration = (startDate, endDate) => {
+  const mseconds = moment(endDate).diff(moment(startDate));
+  let minutes = Math.floor(mseconds / TimeRatio.SECOND_IN_MILLISECONDS / TimeRatio.MINUTES_IN_HOUR);
+  const days = Math.floor(minutes / TimeRatio.MINUTES_IN_HOUR / TimeRatio.HOURS_IN_DAY);
+  const hours = Math.floor((minutes - (days * TimeRatio.HOURS_IN_DAY * TimeRatio.MINUTES_IN_HOUR)) / TimeRatio.MINUTES_IN_HOUR);
+  minutes = minutes - days * TimeRatio.HOURS_IN_DAY * TimeRatio.MINUTES_IN_HOUR - hours * TimeRatio.MINUTES_IN_HOUR;
+
+  if (days !== 0) {
+    return `${addZeroToTime(days)}D ${addZeroToTime(hours)}H ${addZeroToTime(minutes)}M`;
+  }
+
+  if (hours < TimeRatio.HOUR) {
+    return `${addZeroToTime(minutes)}M`;
+  }
+
+  return `${addZeroToTime(hours)}H ${addZeroToTime(minutes)}M`;
 };
 
 export const getFullDate = (date) => {
-  return formatDateToICO(date).split(`T`).join(` `);
+  return formatDate(date).split(`T`).join(` `);
 };
 
 export const formatDateToDay = (date) => {
