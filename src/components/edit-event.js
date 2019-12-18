@@ -4,6 +4,7 @@ import 'flatpickr/dist/flatpickr.css';
 
 import AbstractSmartComponent from './abstract-smart-component';
 
+
 const createoffersMarkup = (offers) => {
   return offers.map((offer) => {
     const {type, price} = offer;
@@ -164,42 +165,72 @@ export const createEditEventTemplate = ({type, city, photo, description, startTi
   </form>`;
 };
 
+const parseFormData = (formData) => {
+  return {
+    id: Math.random(),
+    offers: [],
+    city: formData.get(`event-destination`),
+    type: formData.get(`event-type`),
+    startTime: formData.get(`event-start-time`),
+    endTime: formData.get(`event-end-time`),
+    price: formData.get(`event-price`),
+    isFavorite: formData.get(`event-favorite`),
+    photo: `http://picsum.photos/300/150?r=${Math.random()}`,
+    description: `lorem impsum`,
+    duration: `10H`,
+  };
+};
+
 export default class EditEvent extends AbstractSmartComponent {
   constructor(event) {
     super();
     this._event = event;
     this._flatpickrs = [];
 
+    this._submitHandler = null;
+    this._deleteButtonClickHandler = null;
+    this._favoriteButtonClickHandler = null;
+    this._typeChangeHandler = null;
+    this._destinationInputChangeHandler = null;
+
     this._applyFlatpickrs();
+  }
+
+  removeElement() {
+    this._removeFlatPickrs();
+    super.removeElement();
   }
 
   getTemplate() {
     return createEditEventTemplate(this._event);
   }
 
-  setSubmitHandler(handler) {
-    this
-    .getElement()
-    .addEventListener(`submit`, handler);
+  rerender() {
+    super.rerender();
+
+    this._applyFlatpickrs();
   }
 
-  setFavoriteButtonClickHandler(handler) {
-    this
-      .getElement()
-      .querySelector(`.event__favorite-btn`)
-      .addEventListener(`click`, handler);
+  recoveryListeners() {
+    this.setSubmitHandler(this._submitHandler);
+    this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
+    this.setFavoriteButtonClickHandler(this._favoriteButtonClickHandler);
+    this.setTypeChangeHandler(this._typeChangeHandler);
+    this.setDestinationInputChangeHandler(this._destinationInputChangeHandler);
   }
+
 
   reset() {
+    const event = this._event;
+
+    this._isDateShowing = !!event.endTime;
+    this._currentDescription = event.description;
+
     this.rerender();
   }
 
   _applyFlatpickrs() {
-    if (this._flatpickrs.length) {
-      this._flatpickrs.forEach((calendar) => calendar.destroy());
-      this._flatpickrs = null;
-    }
-
+    this._removeFlatPickrs();
     const timeElements = Array.from(this.getElement().querySelectorAll(`.event__input--time`));
     timeElements.forEach((dateElement) => {
       this._flatpickrs.push(flatpickr(dateElement, {
@@ -210,11 +241,27 @@ export default class EditEvent extends AbstractSmartComponent {
     });
   }
 
+  _removeFlatPickrs() {
+    if (this._flatpickrs.length) {
+      this._flatpickrs.forEach((dataPicker) => dataPicker.destroy());
+      this._flatpickrs = [];
+    }
+  }
+
+  getData() {
+    const form = this.getElement();
+    const formData = new FormData(form);
+
+    return parseFormData(formData);
+  }
+
   setTypeChangeHandler(handler) {
     this
       .getElement()
       .querySelector(`.event__type-list`)
       .addEventListener(`change`, handler);
+
+    this._typeChangeHandler = handler;
   }
 
   setDestinationInputChangeHandler(handler) {
@@ -222,5 +269,32 @@ export default class EditEvent extends AbstractSmartComponent {
       .getElement()
       .querySelector(`.event__input--destination`)
       .addEventListener(`change`, handler);
+
+    this._deleteButtonClickHandler = handler;
+  }
+
+  setDeleteButtonClickHandler(handler) {
+    this
+      .getElement()
+      .querySelector(`.event__reset-btn`)
+      .addEventListener(`click`, handler);
+    this._deleteButtonClickHandler = handler;
+  }
+
+  setSubmitHandler(handler) {
+    this
+      .getElement()
+      .addEventListener(`submit`, handler);
+
+    this._submitHandler = handler;
+  }
+
+  setFavoriteButtonClickHandler(handler) {
+    this
+      .getElement()
+      .querySelector(`.event__favorite-btn`)
+      .addEventListener(`click`, handler);
+
+    this._favoriteButtonClickHandler = handler;
   }
 }
