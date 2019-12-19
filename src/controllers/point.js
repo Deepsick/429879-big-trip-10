@@ -43,42 +43,38 @@ export default class PointController {
     this._eventComponent.setEditButtonClickHandler(() => {
       this._replaceEventToEdit();
       document.addEventListener(`keydown`, this._onEscKeyDown);
+
+      this._editEventComponent.applyFlatpickrs();
+      this._editEventComponent.setSubmitHandler(() => {
+        this._replaceEditToEvent();
+        const data = this._editEventComponent.getData();
+        this._onDataChange(this, point, data);
+      });
+      this._editEventComponent.setFavoriteButtonClickHandler(() => this._onDataChange(
+          this,
+          point,
+          Object.assign({}, point, {isFavorite: !point.isFavorite})
+      ));
+
+      this._editEventComponent.setTypeChangeHandler(() => {
+        const type = this._editEventComponent
+          .getElement()
+          .querySelector(`.event__type-input:checked`)
+          .value;
+        const offers = generateOffers();
+        this._onDataChange(this, point, Object.assign({}, point, {type, offers}));
+      });
+
+      this._editEventComponent.setDestinationInputChangeHandler(() => this._onDataChange(
+          this,
+          point,
+          Object.assign({}, point, {description: genereateDescription()})
+      ));
+
+      this._editEventComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, point, null));
     });
 
     this._editEventComponent = new EditEventComponent(point);
-    this._editEventComponent.setSubmitHandler((evt) => {
-      evt.preventDefault();
-      this._replaceEditToEvent();
-    });
-    this._editEventComponent.setFavoriteButtonClickHandler(() => this._onDataChange(
-        this,
-        point,
-        Object.assign({}, point, {isFavorite: !point.isFavorite})
-    ));
-
-
-    this._editEventComponent.setTypeChangeHandler(() => {
-      const type = this._editEventComponent
-        .getElement()
-        .querySelector(`.event__type-input:checked`)
-        .value;
-      const offers = generateOffers();
-      this._onDataChange(this, point, Object.assign({}, point, {type, offers}));
-    });
-
-    this._editEventComponent.setDestinationInputChangeHandler(() => this._onDataChange(
-        this,
-        point,
-        Object.assign({}, point, {description: genereateDescription()})
-    ));
-
-    this._editEventComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, point, null));
-
-    this._editEventComponent.setSubmitHandler((evt) => {
-      evt.preventDefault();
-      const data = this._editEventComponent.getData();
-      this._onDataChange(this, point, data);
-    });
 
     if (oldEventComponent && oldEditEventComponent) {
       replace(this._eventComponent, oldEventComponent);
@@ -104,6 +100,7 @@ export default class PointController {
   _onEscKeyDown(evt) {
     if (isEscKey(evt.key)) {
       this._replaceEditToEvent(evt);
+      this._editEventComponent.removeFlatPickrs();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     }
   }

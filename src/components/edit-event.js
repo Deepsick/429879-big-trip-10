@@ -192,12 +192,10 @@ export default class EditEvent extends AbstractSmartComponent {
     this._favoriteButtonClickHandler = null;
     this._typeChangeHandler = null;
     this._destinationInputChangeHandler = null;
-
-    this._applyFlatpickrs();
   }
 
   removeElement() {
-    this._removeFlatPickrs();
+    this.removeFlatPickrs();
     super.removeElement();
   }
 
@@ -229,8 +227,7 @@ export default class EditEvent extends AbstractSmartComponent {
     this.rerender();
   }
 
-  _applyFlatpickrs() {
-    this._removeFlatPickrs();
+  applyFlatpickrs() {
     const timeElements = Array.from(this.getElement().querySelectorAll(`.event__input--time`));
     timeElements.forEach((dateElement) => {
       this._flatpickrs.push(flatpickr(dateElement, {
@@ -241,7 +238,7 @@ export default class EditEvent extends AbstractSmartComponent {
     });
   }
 
-  _removeFlatPickrs() {
+  removeFlatPickrs() {
     if (this._flatpickrs.length) {
       this._flatpickrs.forEach((dataPicker) => dataPicker.destroy());
       this._flatpickrs = [];
@@ -277,14 +274,21 @@ export default class EditEvent extends AbstractSmartComponent {
     this
       .getElement()
       .querySelector(`.event__reset-btn`)
-      .addEventListener(`click`, handler);
+      .addEventListener(`click`, () => {
+        handler();
+        this.removeFlatPickrs();
+      });
     this._deleteButtonClickHandler = handler;
   }
 
   setSubmitHandler(handler) {
     this
       .getElement()
-      .addEventListener(`submit`, handler);
+      .addEventListener(`submit`, (evt) => {
+        evt.preventDefault();
+        handler();
+        this.removeFlatPickrs();
+      });
 
     this._submitHandler = handler;
   }
