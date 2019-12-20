@@ -1,5 +1,11 @@
 import AbstractComponent from './abstract-component';
 
+const FILTER_ID_PREFIX = `filter-`;
+
+const getFilterNameById = (id) => {
+  return id.substring(FILTER_ID_PREFIX.length);
+};
+
 const createFilterTemplate = (filter) => {
   const {title, value, checked} = filter;
 
@@ -30,6 +36,15 @@ export default class Filters extends AbstractComponent {
 
   getTemplate() {
     return createFiltersTemplate(this._filters);
+  }
+
+  setFilterChangeHandler(handler) {
+    this
+      .getElement()
+      .addEventListener(`change`, (evt) => {
+        const filterName = getFilterNameById(evt.target.id);
+        handler(filterName);
+      });
   }
 }
 
