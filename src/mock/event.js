@@ -1,3 +1,4 @@
+import {Sign} from '../const';
 import {getRandomArrayElement, getRandomIntervalNumber} from '../utils/common';
 
 const TYPES = [
@@ -86,7 +87,7 @@ const generateEvent = () => {
     description: genereateDescription(),
     startTime: generateDate(now),
     endTime: generateDate(now, randomHours),
-    duration: `${randomHours}H`,
+    duration: `${randomHours}${Sign.HOUR}`,
     price: getRandomIntervalNumber(10, 300),
     offers: generateOffers(),
     isFavorite: false,
