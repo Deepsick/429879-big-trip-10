@@ -44,3 +44,16 @@ export const MenuItem = {
   TABLE: `table`,
   STATS: `stats`,
 };
+
+export const Emoji = {
+  'taxi': `🚕`,
+  'bus': `🚌`,
+  'train': `🚂`,
+  'ship': `🚢`,
+  'transport': `🚆`,
+  'drive': `🚗`,
+  'flight': `✈️`,
+  'check-in': `🏨`,
+  'sightseeing': `🏛️`,
+  'restaurant': `🍴`,
+};

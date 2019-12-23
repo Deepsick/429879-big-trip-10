@@ -1,7 +1,7 @@
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-import {Sign} from '../const';
+import {Sign, Emoji} from '../const';
 
 import AbstractComponent from "./abstract-component";
 const EVENT_COUNTER = 1;
@@ -324,7 +324,7 @@ export default class Statistics extends AbstractComponent {
       .map((event) => event.type)
       .filter(getUniqueItems);
     this._data = getDateByTypes(this._labels, this._events.getPoints());
-
+    this._labels = this._labels.map((label) => `${Emoji[label]} ${label}`);
     this._moneyChart = renderMoneyChart(moneyCtx, this._labels, getMoneyByTypes(this._data));
     this._transportChart = renderTransportChart(transportCtx, this._labels, getCountByTypes(this._data));
     this._timeChart = renderTimeChart(timeCtx, this._labels, getTimeByTypes(this._data));
