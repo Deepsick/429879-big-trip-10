@@ -1,12 +1,11 @@
+import {TagName} from '../const';
 import AbstractComponent from './abstract-component';
-
 export const SortType = {
   EVENT: `sort-event`,
   TIME: `sort-time`,
   PRICE: `sort-price`,
 };
 
-const LABEL_TAG_NAME = `label`;
 
 const createSortTemplate = () => (
   `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
@@ -56,7 +55,7 @@ export default class Sort extends AbstractComponent {
       evt.preventDefault();
 
       const currentTarget = evt.target;
-      if (currentTarget.tagName.toLowerCase() !== LABEL_TAG_NAME) {
+      if (currentTarget.tagName.toLowerCase() !== TagName.LABEL) {
         return;
       }
 

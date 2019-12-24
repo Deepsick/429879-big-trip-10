@@ -28,5 +28,32 @@ export const TimeRatio = {
 };
 
 export const ESCAPE_NAMES = [`Escape`, `Esc`];
+export const HIDDEN_CLASS = `visually-hidden`;
+export const Sign = {
+  HOUR: `H`,
+  EURO: `€`,
+  COUNT: `x`,
+};
 
-export const HOUR_SIGN = `H`;
+export const TagName = {
+  LABEL: `label`,
+  LINK: `a`,
+};
+
+export const MenuItem = {
+  TABLE: `table`,
+  STATS: `stats`,
+};
+
+export const Emoji = {
+  'taxi': `🚕`,
+  'bus': `🚌`,
+  'train': `🚂`,
+  'ship': `🚢`,
+  'transport': `🚆`,
+  'drive': `🚗`,
+  'flight': `✈️`,
+  'check-in': `🏨`,
+  'sightseeing': `🏛️`,
+  'restaurant': `🍴`,
+};

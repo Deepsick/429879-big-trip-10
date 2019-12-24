@@ -1,5 +1,5 @@
 import {render} from '../utils/render';
-import {HOUR_SIGN} from '../const';
+import {Sign} from '../const';
 
 import PointController, {Mode as PointControllerMode, EmptyPoint} from './point';
 
@@ -70,6 +70,18 @@ export default class TripController {
     this._creatingPoint.render(EmptyPoint, PointControllerMode.ADDING);
   }
 
+  hide() {
+    this._sortComponent.hide();
+    this._noTripDaysComponent.hide();
+    this._tripDaysComponent.hide();
+  }
+
+  show() {
+    this._sortComponent.show();
+    this._noTripDaysComponent.show();
+    this._tripDaysComponent.show();
+  }
+
   _removePoints() {
     this._pointControllers.forEach((pointController) => pointController.destroy());
     this._pointControllers = [];
@@ -128,7 +140,7 @@ export default class TripController {
         sortedEvents = [...this._pointsModel.getPoints()];
         break;
       case SortType.TIME:
-        sortedEvents = [...this._pointsModel.getPoints()].sort((left, right) => +right.duration.replace(HOUR_SIGN, ``) - +left.duration.replace(HOUR_SIGN, ``));
+        sortedEvents = [...this._pointsModel.getPoints()].sort((left, right) => +right.duration.replace(Sign.HOUR, ``) - +left.duration.replace(Sign.HOUR, ``));
         break;
       case SortType.PRICE:
         sortedEvents = [...this._pointsModel.getPoints()].sort((left, right) => right.price - left.price);

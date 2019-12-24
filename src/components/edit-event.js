@@ -278,6 +278,7 @@ export default class EditEvent extends AbstractSmartComponent {
         handler();
         this.removeFlatPickrs();
       });
+
     this._deleteButtonClickHandler = handler;
   }
 
