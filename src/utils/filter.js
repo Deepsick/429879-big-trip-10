@@ -1,8 +1,8 @@
 import {FilterType} from '../const.js';
 
 const getFuturePoints = (points, date) => {
-  return points.filter((task) => {
-    const {endTime} = task;
+  return points.filter((point) => {
+    const {endTime} = point;
 
     if (!endTime) {
       return false;
@@ -13,8 +13,8 @@ const getFuturePoints = (points, date) => {
 };
 
 const getPastPoints = (points, date) => {
-  return points.filter((task) => {
-    const {endTime} = task;
+  return points.filter((point) => {
+    const {endTime} = point;
 
     if (!endTime) {
       return false;

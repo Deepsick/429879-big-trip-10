@@ -1,9 +1,5 @@
 import moment from 'moment';
-
-
-import {MONTHS, ESCAPE_NAMES, TimeRatio} from '../const';
-
-const MIN_ARRAY_INDEX = 0;
+import {ESCAPE_NAMES, TimeRatio} from '../const';
 
 export const formatDate = (date) => {
   return moment(date).format(`DD/MM/YYYY hh:mm`);
@@ -11,6 +7,10 @@ export const formatDate = (date) => {
 
 export const formatTime = (date) => {
   return moment(date).format(`hh:mm`);
+};
+
+export const formatDateToDay = (date) => {
+  return moment(date).format(`MMM D`);
 };
 
 const addZeroToTime = (time) => {
@@ -39,27 +39,11 @@ export const getFullDate = (date) => {
   return formatDate(date).split(`T`).join(` `);
 };
 
-export const formatDateToDay = (date) => {
-
-  const month = MONTHS[date.getUTCMonth()];
-  const day = date.getUTCDate();
-
-  return `${month} ${day}`;
-};
-
 export const formatToTitleCase = (word) => {
   const firstLetter = word[0].toUpperCase();
   return `${firstLetter}${word.slice(1)}`;
 };
 
-export const getRandomIntervalNumber = (min, max) => {
-  return min + Math.floor(Math.random() * max);
-};
-
 export const isEscKey = (key) => ESCAPE_NAMES.includes(key);
 
-export const getRandomArrayElement = (array) => {
-  const randomIndex = getRandomIntervalNumber(MIN_ARRAY_INDEX, array.length);
-
-  return array[randomIndex];
-};
+export const getLastArrayElement = (array) => array[array.length - 1];

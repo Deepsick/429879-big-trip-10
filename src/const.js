@@ -4,21 +4,6 @@ export const FilterType = {
   PAST: `past`,
 };
 
-export const MONTHS = [
-  `January`,
-  `February`,
-  `March`,
-  `April`,
-  `May`,
-  `June`,
-  `July`,
-  `August`,
-  `September`,
-  `October`,
-  `November`,
-  `December`,
-];
-
 export const TimeRatio = {
   DOUBLE_DIGIT: 10,
   HOUR: 1,
@@ -57,3 +42,25 @@ export const Emoji = {
   'sightseeing': `🏛️`,
   'restaurant': `🍴`,
 };
+
+export const Method = {
+  GET: `GET`,
+  POST: `POST`,
+  PUT: `PUT`,
+  DELETE: `DELETE`
+};
+
+export const Route = {
+  POINTS: `points`,
+  DESTINATIONS: `destinations`,
+  OFFERS: `offers`,
+};
+
+export const AUTHORIZATION = `Basic azaza=`;
+export const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
+
+export const FILTER_ID_PREFIX = `filter-`;
+export const ACTIVE_MENU_ITEM_CLASS = `trip-tabs__btn--active`;
+export const ROUTE_SEPARATOR = `&mdash;`;
+export const ROUTE_REPLACER = `...`;
+export const ROUTE_COUNT = 3;

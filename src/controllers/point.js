@@ -1,10 +1,9 @@
 import {render, replace, remove} from '../utils/render';
 import {isEscKey} from '../utils/common';
 
-import EditEventComponent from '../components/edit-event';
-import EventComponent from '../components/event';
+import EditEventComponent from '../components/edit-point';
+import EventComponent from '../components/point';
 
-import {generateOffers, genereateDescription} from '../mock/event';
 
 export const Mode = {
   DEFAULT: `default`,

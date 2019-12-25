@@ -8,7 +8,6 @@ import TripDayComponent from '../components/trip-day';
 import TripDaysComponent from '../components/trip-days';
 import NoTripDaysComponent from '../components/no-trip-days';
 
-import {generateTripDay} from '../mock/trip-day';
 
 const IS_CHECKED = true;
 
@@ -50,8 +49,7 @@ export default class TripController {
       return;
     }
 
-    const tripDay = generateTripDay();
-    this._tripDayComponent = new TripDayComponent(tripDay);
+    this._tripDayComponent = new TripDayComponent();
     const newPoints = this._renderPoints(points);
     this._pointControllers = [...this._pointControllers, ...newPoints];
 
