@@ -2,25 +2,25 @@ import {FilterType} from '../const.js';
 
 const getFuturePoints = (points, date) => {
   return points.filter((point) => {
-    const {endTime} = point;
+    const {dateFrom} = point;
 
-    if (!endTime) {
+    if (!dateFrom) {
       return false;
     }
 
-    return endTime > date;
+    return dateFrom > date;
   });
 };
 
 const getPastPoints = (points, date) => {
   return points.filter((point) => {
-    const {endTime} = point;
+    const {dateTo} = point;
 
-    if (!endTime) {
+    if (!dateTo) {
       return false;
     }
 
-    return endTime < date;
+    return dateTo < date;
   });
 };
 

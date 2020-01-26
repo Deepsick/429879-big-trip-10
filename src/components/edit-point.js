@@ -1,18 +1,22 @@
 import flatpickr from 'flatpickr';
-
 import 'flatpickr/dist/flatpickr.css';
+
+import {getTitlePlaceholder} from '../utils/common';
+import {formatFlatpickrDate} from '../utils/date';
+import {ButtonText} from '../const';
+
+import PointModel from '../models/point';
 
 import AbstractSmartComponent from './abstract-smart-component';
 
-
 const createoffersMarkup = (offers) => {
   return offers.map((offer) => {
-    const {type, price} = offer;
+    const {title, price} = offer;
     return (
       `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${type}-1" type="checkbox" name="event-offer-${type}" checked>
-        <label class="event__offer-label" for="event-offer-${type}-1">
-          <span class="event__offer-title">${type}</span>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${title}-1" type="checkbox" name="event-offer" value='${title}-${price}'>
+        <label class="event__offer-label" for="event-offer-${title}-1">
+          <span class="event__offer-title">${title}</span>
           &plus;
           &euro;&nbsp;<span class="event__offer-price">${price}</span>
         </label>
@@ -21,7 +25,91 @@ const createoffersMarkup = (offers) => {
   });
 };
 
-export const createEditEventTemplate = ({type, city, photo, description, startTime, endTime, price, isFavorite, offers}) => {
+const createOfferSection = (isAdd, offers) => {
+  if (isAdd) {
+    return ``;
+  }
+
+  return (
+    `<section class="event__section  event__section--offers">
+      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+
+      <div class="event__available-offers">
+        ${createoffersMarkup(offers).join(``)}
+      </div>
+    </section>`
+  );
+};
+
+const createFavoriteButtonMarkup = (isAdd, isFavorite) => {
+  if (isAdd) {
+    return ``;
+  }
+
+  return (
+    `<input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
+    <label class="event__favorite-btn" for="event-favorite-1">
+      <span class="visually-hidden">Add to favorite</span>
+      <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+        <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
+      </svg>
+    </label>`
+  );
+};
+
+const createRollupButtonMarkup = (isAdd) => {
+  if (isAdd) {
+    return ``;
+  }
+
+  return (
+    `<button class="event__rollup-btn" type="button">
+      <span class="visually-hidden">Open event</span>
+    </button>`
+  );
+};
+
+const createDatalist = (destinations) => {
+  return destinations.map((destination) => `<option value="${destination}"></option>`);
+};
+
+const createPicturesMarkup = (pictures) => {
+  return pictures.map((picture) => {
+    const {src, description} = picture;
+
+    return (
+      `<img class="event__photo" src="${src}" alt="${description}">`
+    );
+  });
+};
+
+const createDescription = (isAdd, destination) => {
+  if (isAdd) {
+    return ``;
+  }
+
+  const {description, pictures} = destination;
+  return (
+    `<section class="event__section  event__section--destination">
+      <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+      <p class="event__destination-description">${description}</p>
+    
+      <div class="event__photos-container">
+        <div class="event__photos-tape">
+          ${createPicturesMarkup(pictures).join(``)}
+        </div>
+      </div>
+    </section>`
+  );
+};
+
+export const createEditPointTemplate = ({type, destination, dateFrom, dateTo, price, isFavorite, offers, isAdd}, destinations, externalData) => {
+  const {name} = destination;
+
+  const deleteButtonText = externalData.DELETE;
+  const saveButtonText = externalData.SAVE;
+  const cancelButtonText = externalData.CANCEL;
+
   return `<form class="event  event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
@@ -94,13 +182,11 @@ export const createEditEventTemplate = ({type, city, photo, description, startTi
 
       <div class="event__field-group  event__field-group--destination">
         <label class="event__label  event__type-output" for="event-destination-1">
-          ${type} at
+          ${type} ${getTitlePlaceholder(type)}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name}" list="destination-list-1">
         <datalist id="destination-list-1">
-          <option value="Amsterdam"></option>
-          <option value="Geneva"></option>
-          <option value="Chamonix"></option>
+          ${createDatalist(destinations).join(``)}
         </datalist>
       </div>
 
@@ -108,12 +194,12 @@ export const createEditEventTemplate = ({type, city, photo, description, startTi
         <label class="visually-hidden" for="event-start-time-1">
           From
         </label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${startTime}">
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dateFrom}">
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">
           To
         </label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${endTime}">
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dateTo}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -124,68 +210,50 @@ export const createEditEventTemplate = ({type, city, photo, description, startTi
         <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
       </div>
 
-      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="reset">Delete</button>
-
-      <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
-      <label class="event__favorite-btn" for="event-favorite-1">
-        <span class="visually-hidden">Add to favorite</span>
-        <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
-          <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
-        </svg>
-      </label>
-
-      <button class="event__rollup-btn" type="button">
-        <span class="visually-hidden">Open event</span>
-      </button>
+      <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
+      <button class="event__reset-btn" type="reset">${isAdd ? cancelButtonText : deleteButtonText}</button>
+      ${createFavoriteButtonMarkup(isAdd, isFavorite)}
+      ${createRollupButtonMarkup(isAdd)}
     </header>
 
     <section class="event__details">
-
-      <section class="event__section  event__section--offers">
-        <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-        <div class="event__available-offers">
-          ${createoffersMarkup(offers).join(``)}
-        </div>
-      </section>
-
-      <section class="event__section  event__section--destination">
-        <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-        <p class="event__destination-description">${description}</p>
-
-        <div class="event__photos-container">
-          <div class="event__photos-tape">
-            <img class="event__photo" src="${photo}" alt="Event photo">
-            <img class="event__photo" src="${photo}" alt="Event photo">
-          </div>
-        </div>
-      </section>
+      ${createOfferSection(isAdd, offers)}
+      ${createDescription(isAdd, destination)}
     </section>
   </form>`;
 };
 
-const parseFormData = (formData) => {
-  return {
-    id: Math.random(),
-    offers: [],
-    city: formData.get(`event-destination`),
-    type: formData.get(`event-type`),
-    startTime: formData.get(`event-start-time`),
-    endTime: formData.get(`event-end-time`),
-    price: formData.get(`event-price`),
-    isFavorite: formData.get(`event-favorite`),
-    photo: `http://picsum.photos/300/150?r=${Math.random()}`,
-    description: `lorem impsum`,
-    duration: `10H`,
-  };
+const parseFormData = (formData, id, isFavorite) => {
+  const dateFrom = formData.get(`event-start-time`);
+  const dateTo = formData.get(`event-end-time`);
+  const offers = formData.getAll(`event-offer`);
+  const preparedOffers = offers.map((offer) => {
+    const [title, price] = offer.split(`-`);
+    return {
+      title,
+      price,
+    };
+  });
+
+  return new PointModel({
+    id,
+    'base_price': formData.get(`event-price`),
+    'date_from': dateFrom,
+    'date_to': dateTo,
+    'destination': formData.get(`event-destination`),
+    'is_favorite': isFavorite,
+    'type': formData.get(`event-type`),
+    'offers': preparedOffers,
+  });
 };
 
-export default class EditEvent extends AbstractSmartComponent {
-  constructor(event) {
+export default class EditPoint extends AbstractSmartComponent {
+  constructor(point, destinations) {
     super();
-    this._event = event;
+    this._point = point;
+    this._destinations = destinations;
     this._flatpickrs = [];
+    this._externalData = ButtonText;
 
     this._submitHandler = null;
     this._deleteButtonClickHandler = null;
@@ -200,13 +268,11 @@ export default class EditEvent extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createEditEventTemplate(this._event);
+    return createEditPointTemplate(this._point, this._destinations, this._externalData);
   }
 
   rerender() {
     super.rerender();
-
-    this._applyFlatpickrs();
   }
 
   recoveryListeners() {
@@ -219,11 +285,6 @@ export default class EditEvent extends AbstractSmartComponent {
 
 
   reset() {
-    const event = this._event;
-
-    this._isDateShowing = !!event.endTime;
-    this._currentDescription = event.description;
-
     this.rerender();
   }
 
@@ -232,8 +293,8 @@ export default class EditEvent extends AbstractSmartComponent {
     timeElements.forEach((dateElement) => {
       this._flatpickrs.push(flatpickr(dateElement, {
         allowInput: true,
-        defaultDate: dateElement.id.includes(`event-end-time`) ? this._event.endTime : this._event.startTime,
-        dateFormat: `d/m/Y H:i`,
+        defaultDate: dateElement.id.includes(`event-end-time`) ? formatFlatpickrDate(this._point.dateTo) : formatFlatpickrDate(this._point.dateFrom),
+        dateFormat: `d/m/Y h:i`,
       }));
     });
   }
@@ -248,8 +309,12 @@ export default class EditEvent extends AbstractSmartComponent {
   getData() {
     const form = this.getElement();
     const formData = new FormData(form);
+    return parseFormData(formData, this._point.id, this._point.isFavorite);
+  }
 
-    return parseFormData(formData);
+  setData(data) {
+    this._externalData = Object.assign({}, ButtonText, data);
+    this.rerender();
   }
 
   setTypeChangeHandler(handler) {
@@ -267,7 +332,14 @@ export default class EditEvent extends AbstractSmartComponent {
       .querySelector(`.event__input--destination`)
       .addEventListener(`change`, handler);
 
-    this._deleteButtonClickHandler = handler;
+    this._destinationInputChangeHandler = handler;
+  }
+
+  setEditButtonClickHandler(handler) {
+    this
+      .getElement()
+      .querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, handler);
   }
 
   setDeleteButtonClickHandler(handler) {

@@ -1,13 +1,13 @@
 import AbstractComponent from './abstract-component';
-import {formatTime, formatDate} from '../utils/common';
+import {formatTagTime} from '../utils/date';
 
 const createTripDayTemplate = (tripDay) => {
-  const {day, date} = tripDay;
+  const {count, date} = tripDay;
 
   return `<li class="trip-days__item  day">
     <div class="day__info">
-      <span class="day__counter">${day}</span>
-      <time class="day__date" datetime="${formatDate(date)}">${formatTime(date)}</time>
+      <span class="day__counter">${count}</span>
+      <time class="day__date" datetime="${formatTagTime(date)}">${date}</time>
     </div>
     <ul class="trip-events__list"></ul>
   </li>`;

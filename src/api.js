@@ -2,6 +2,7 @@ import {Method, Route} from './const';
 
 import Point from './models/point.js';
 import Destination from './models/destination';
+import Offer from './models/offer';
 
 const checkStatus = (response) => {
   const {status, statusText} = response;
@@ -24,16 +25,30 @@ const Api = class {
       .then(Point.parsePoints);
   }
 
-  createPoint() {
-
+  createPoint(point) {
+    return this._load({
+      route: Route.POINTS,
+      method: Method.POST,
+      body: JSON.stringify(point.toRAW()),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+    .then((response) => response.json())
+    .then(Point.parsePoint);
   }
 
-  updatePoint() {
-
+  updatePoint(id, data) {
+    return this._load({
+      route: `${Route.POINTS}/${id}`,
+      method: Method.PUT,
+      body: JSON.stringify(data.toRAW()),
+      headers: new Headers({'Content-Type': `application/json`}),
+    })
+    .then((response) => response.json())
+    .then(Point.parsePoint);
   }
 
-  deletePoint() {
-
+  deletePoint(id) {
+    return this._load({route: `${Route.POINTS}/${id}`, method: Method.DELETE});
   }
 
   getDestinations() {
@@ -43,12 +58,13 @@ const Api = class {
   }
 
   getOffers() {
-
+    return this._load({route: Route.OFFERS})
+      .then((response) => response.json())
+      .then(Offer.parseOffers);
   }
 
   _load({route, method = Method.GET, body = null, headers = new Headers()}) {
     headers.append(`Authorization`, this._authorization);
-
     return fetch(`${this._endpoint}/${route}`, {method, body, headers})
       .then(checkStatus)
       .catch((err) => {

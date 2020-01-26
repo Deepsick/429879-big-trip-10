@@ -47,7 +47,7 @@ export const Method = {
   GET: `GET`,
   POST: `POST`,
   PUT: `PUT`,
-  DELETE: `DELETE`
+  DELETE: `DELETE`,
 };
 
 export const Route = {
@@ -64,3 +64,41 @@ export const ACTIVE_MENU_ITEM_CLASS = `trip-tabs__btn--active`;
 export const ROUTE_SEPARATOR = `&mdash;`;
 export const ROUTE_REPLACER = `...`;
 export const ROUTE_COUNT = 3;
+export const OFFER_COUNT = 3;
+export const IS_CHECKED = true;
+
+export const Transport = {
+  TAXI: `taxi`,
+  BUS: `bus`,
+  TRAIN: `train`,
+  SHIP: `ship`,
+  TRANSPORT: `transport`,
+  DRIVE: `drive`,
+  FLIGHT: `flight`,
+};
+
+export const Station = {
+  CHECK: `check`,
+  SIGHTSEEING: `sightseeing`,
+  RESTAURANT: `restaurant`,
+};
+
+export const TitlePlaceholder = {
+  STATION: `in`,
+  TRANSPORT: `to`,
+};
+
+export const DEFAULT_TRIP_DAY = {
+  count: 0,
+  date: new Date().toISOString(),
+};
+
+export const ButtonText = {
+  CANCEL: `Cancel`,
+  DELETE: `Delete`,
+  SAVE: `Save`,
+};
+
+export const EVENT_COUNTER = 1;
+
+

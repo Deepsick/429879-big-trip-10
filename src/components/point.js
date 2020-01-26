@@ -1,22 +1,35 @@
 import AbstractComponent from './abstract-component';
-import {formatTime, formatDate, formatDuration} from '../utils/common';
+import {OFFER_COUNT} from '../const';
+import {getTitlePlaceholder, formatToTitleCase} from '../utils/common';
+import {formatTime, formatDuration, formatTagTime} from '../utils/date';
+
+const createOfferTemplate = (offer) => {
+  const {title, price} = offer;
+
+  return (
+    `<li class="event__offer">
+      <span class="event__offer-title">${title}</span>
+      &plus;
+      &euro;&nbsp;<span class="event__offer-price">${price}</span>
+    </li>`
+  );
+};
 
 const generateOffersMarkup = (offers) => {
-  return offers.map((offer) => {
-    const {type, price} = offer;
-    return (
-      `<li class="event__offer">
-        <span class="event__offer-title">${type}</span>
-        &plus;
-        &euro;&nbsp;<span class="event__offer-price">${price}</span>
-      </li>`
-    );
-  });
+  const offerNodes = [];
+  for (let i = 0; i < offers.length; i++) {
+    if (i === OFFER_COUNT) {
+      break;
+    }
+    offerNodes.push(createOfferTemplate(offers[i]));
+  }
+
+  return offerNodes;
 };
 
 
-const createEventTemplate = (event) => {
-  const {type, description, startTime, endTime, price, offers} = event;
+const createPointTemplate = (point) => {
+  const {type, destination, dateFrom, dateTo, price, offers, duration} = point;
   const offersMarkup = generateOffersMarkup(offers).join(``);
 
   return `<li class="trip-events__item">
@@ -24,15 +37,15 @@ const createEventTemplate = (event) => {
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
       </div>
-      <h3 class="event__title">${description}</h3>
+      <h3 class="event__title">${formatToTitleCase(type)} ${getTitlePlaceholder(type)} ${destination.name}</h3>
 
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="${formatDate(startTime)}">${formatTime(startTime)}</time>
+          <time class="event__start-time" datetime="${formatTagTime(dateFrom)}">${formatTime(dateFrom)}</time>
           &mdash;
-          <time class="event__end-time" datetime="${formatDate(endTime)}">${formatTime(endTime)}</time>
+          <time class="event__end-time" datetime="${formatTagTime(dateTo)}">${formatTime(dateTo)}</time>
         </p>
-        <p class="event__duration">${formatDuration(startTime, endTime)}</p>
+        <p class="event__duration">${formatDuration(duration)}</p>
       </div>
 
       <p class="event__price">
@@ -57,7 +70,7 @@ export default class Event extends AbstractComponent {
   }
 
   getTemplate() {
-    return createEventTemplate(this._event);
+    return createPointTemplate(this._event);
   }
 
   setEditButtonClickHandler(handler) {

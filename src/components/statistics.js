@@ -1,47 +1,51 @@
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-import {Sign, Emoji} from '../const';
+import {Sign, Emoji, EVENT_COUNTER} from '../const';
+import {getUniqueItems, isTransport} from '../utils/common';
+import {formatStatisticsDuration} from '../utils/date';
 
 import AbstractComponent from "./abstract-component";
-const EVENT_COUNTER = 1;
 
-const getUniqueItems = (array) => Array.from(new Set(array));
 
-const getDateByTypes = (types, events) => {
+const getDateByTypes = (types, points) => {
   const dataTypes = [...types].map((type) => {
     return {
       name: type,
+      isTransport: isTransport(type),
       sum: 0,
       count: 0,
       time: 0,
     };
   });
-  events.forEach((event) => {
-    const {type: eventType, price, duration} = event;
-    const index = dataTypes.findIndex((type) => type.name === eventType);
+  points.forEach((point) => {
+    const {type: pointType, price, duration} = point;
+    const index = dataTypes.findIndex((type) => type.name === pointType);
     dataTypes[index].sum += price;
     dataTypes[index].count += EVENT_COUNTER;
-    dataTypes[index].time += +duration.replace(Sign.HOUR, ``);
+    dataTypes[index].time += duration;
   });
 
   return dataTypes;
 };
 
+const addEmojis = (types) => types.map((type) => `${Emoji[type]} ${type}`);
 
 const getMoneyByTypes = (dataItems) => dataItems.map((type) => type.sum);
 const getCountByTypes = (dataItems) => dataItems.map((type) => type.count);
 const getTimeByTypes = (dataItems) => dataItems.map((type) => type.time);
 
-const renderMoneyChart = (eventsCtx, labels, events) => {
+const renderMoneyChart = (eventsCtx, labels, points) => {
   return new Chart(eventsCtx, {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
       labels,
       datasets: [{
-        data: events,
+        data: points,
         backgroundColor: `#ffffff`,
+        barPercentage: 0.5,
+        categoryPercentage: 0.5,
       }]
     },
     options: {
@@ -58,8 +62,6 @@ const renderMoneyChart = (eventsCtx, labels, events) => {
           gridLines: {
             display: false,
           },
-          categoryPercentage: 0.5,
-          barPercentage: 0.5,
         }],
       },
       tooltips: {
@@ -113,15 +115,17 @@ const renderMoneyChart = (eventsCtx, labels, events) => {
   });
 };
 
-const renderTransportChart = (eventsCtx, labels, events) => {
+const renderTransportChart = (eventsCtx, labels, points) => {
   return new Chart(eventsCtx, {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
       labels,
       datasets: [{
-        data: events,
+        data: points,
         backgroundColor: `#ffffff`,
+        categoryPercentage: 0.5,
+        barPercentage: 0.5,
       }]
     },
     options: {
@@ -138,8 +142,6 @@ const renderTransportChart = (eventsCtx, labels, events) => {
           gridLines: {
             display: false,
           },
-          categoryPercentage: 0.5,
-          barPercentage: 0.5,
         }],
       },
       tooltips: {
@@ -193,15 +195,17 @@ const renderTransportChart = (eventsCtx, labels, events) => {
   });
 };
 
-const renderTimeChart = (eventsCtx, labels, events) => {
+const renderTimeChart = (eventsCtx, labels, points) => {
   return new Chart(eventsCtx, {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
       labels,
       datasets: [{
-        data: events,
+        data: points,
         backgroundColor: `#ffffff`,
+        categoryPercentage: 0.5,
+        barPercentage: 0.5,
       }]
     },
     options: {
@@ -218,8 +222,6 @@ const renderTimeChart = (eventsCtx, labels, events) => {
           gridLines: {
             display: false,
           },
-          categoryPercentage: 0.5,
-          barPercentage: 0.5,
         }],
       },
       tooltips: {
@@ -294,10 +296,10 @@ const createStatisticsTemplate = () => {
 };
 
 export default class Statistics extends AbstractComponent {
-  constructor(events) {
+  constructor(points) {
     super();
 
-    this._events = events;
+    this._points = points;
     this._data = null;
     this._labels = null;
 
@@ -320,14 +322,14 @@ export default class Statistics extends AbstractComponent {
     const timeCtx = element.querySelector(`.statistics__chart--time`);
 
     this._resetCharts();
-    this._labels = this._events.getPoints()
-      .map((event) => event.type)
-      .filter(getUniqueItems);
-    this._data = getDateByTypes(this._labels, this._events.getPoints());
-    this._labels = this._labels.map((label) => `${Emoji[label]} ${label}`);
+    this._labels = getUniqueItems(this._points.getPoints().map((point) => point.type));
+
+    this._data = getDateByTypes(this._labels, this._points.getPoints());
+    const transportLabels = addEmojis(this._labels.filter(isTransport));
+    this._labels = addEmojis(this._labels);
     this._moneyChart = renderMoneyChart(moneyCtx, this._labels, getMoneyByTypes(this._data));
-    this._transportChart = renderTransportChart(transportCtx, this._labels, getCountByTypes(this._data));
-    this._timeChart = renderTimeChart(timeCtx, this._labels, getTimeByTypes(this._data));
+    this._transportChart = renderTransportChart(transportCtx, transportLabels, getCountByTypes(this._data));
+    this._timeChart = renderTimeChart(timeCtx, this._labels, getTimeByTypes(this._data).map(formatStatisticsDuration));
   }
 
   _resetCharts() {

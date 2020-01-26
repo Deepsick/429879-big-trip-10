@@ -1,9 +1,10 @@
-import {render, replace, remove} from '../utils/render';
+import {render, replace, remove, RenderPosition} from '../utils/render';
 import {isEscKey} from '../utils/common';
 
 import EditEventComponent from '../components/edit-point';
 import EventComponent from '../components/point';
 
+import PointModel from '../models/point.js';
 
 export const Mode = {
   DEFAULT: `default`,
@@ -12,19 +13,24 @@ export const Mode = {
 };
 
 export const EmptyPoint = {
-  destination: ``,
-  type: null,
-  startTime: null,
-  endTime: null,
-  price: 0,
-  isFavorite: false,
+  destination: {
+    name: ``,
+  },
+  type: `taxi`,
+  dateFrom: new Date(),
+  dateTo: new Date(),
+  price: ``,
+  offers: [],
+  isAdd: true,
 };
 
 export default class PointController {
-  constructor(container, onDataChange, onViewChange) {
+  constructor(container, destinationsModel, offersModel, onDataChange, onViewChange) {
     this._container = container;
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
+    this._destinationsModel = destinationsModel;
+    this._offersModel = offersModel;
     this._mode = Mode.DEFAULT;
 
     this._eventComponent = null;
@@ -42,45 +48,85 @@ export default class PointController {
     this._eventComponent.setEditButtonClickHandler(() => {
       this._replaceEventToEdit();
       document.addEventListener(`keydown`, this._onEscKeyDown);
-
-      this._editEventComponent.applyFlatpickrs();
-      this._editEventComponent.setSubmitHandler(() => {
-        this._replaceEditToEvent();
-        const data = this._editEventComponent.getData();
-        this._onDataChange(this, point, data);
-      });
-      this._editEventComponent.setFavoriteButtonClickHandler(() => this._onDataChange(
-          this,
-          point,
-          Object.assign({}, point, {isFavorite: !point.isFavorite})
-      ));
-
-      this._editEventComponent.setTypeChangeHandler(() => {
-        const type = this._editEventComponent
-          .getElement()
-          .querySelector(`.event__type-input:checked`)
-          .value;
-        const offers = generateOffers();
-        this._onDataChange(this, point, Object.assign({}, point, {type, offers}));
-      });
-
-      this._editEventComponent.setDestinationInputChangeHandler(() => this._onDataChange(
-          this,
-          point,
-          Object.assign({}, point, {description: genereateDescription()})
-      ));
-
-      this._editEventComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, point, null));
     });
 
-    this._editEventComponent = new EditEventComponent(point);
+    this._editEventComponent = new EditEventComponent(point, this._destinationsModel.getDestinationNames());
+    this._editEventComponent.applyFlatpickrs();
+    this._editEventComponent.setEditButtonClickHandler(() => {
+      this._replaceEditToEvent();
+      document.removeEventListener(`keydown`, this._onEscKeyDown);
+    });
+    this._editEventComponent.setSubmitHandler(() => {
+      this._editEventComponent.setData({
+        SAVE: `Saving...`,
+      });
+      const data = this._editEventComponent.getData();
+      this._onDataChange(this, point, data);
+      this._replaceEditToEvent();
+    });
+    this._editEventComponent.setFavoriteButtonClickHandler(() => {
+      const newPoint = PointModel.clone(point);
+      newPoint.isFavorite = !newPoint.isFavorite;
+      this._onDataChange(this, point, newPoint, Mode.EDIT);
+    });
 
-    if (oldEventComponent && oldEditEventComponent) {
-      replace(this._eventComponent, oldEventComponent);
-      replace(this._editEventComponent, oldEditEventComponent);
-      return;
+    this._editEventComponent.setTypeChangeHandler(() => {
+      const newPoint = PointModel.clone(point);
+      const type = this._editEventComponent
+        .getElement()
+        .querySelector(`.event__type-input:checked`)
+        .value;
+      const offers = this._offersModel.getTypeOffers(type).offers;
+      newPoint.type = type;
+      newPoint.offers = offers;
+      this._onDataChange(this, point, newPoint, Mode.EDIT, false);
+    });
+
+    this._editEventComponent.setDestinationInputChangeHandler(() => {
+      const newPoint = PointModel.clone(point);
+      const destination = this._editEventComponent
+        .getElement()
+        .querySelector(`.event__input--destination`)
+        .value;
+      const description = this._destinationsModel.getDestination(destination);
+      newPoint.destination = description;
+      this._onDataChange(this, point, newPoint, Mode.EDIT, false);
+    });
+
+    this._editEventComponent.setDeleteButtonClickHandler(() => {
+      this._editEventComponent.setData({
+        DELETE: `Deleting...`,
+      });
+      this._onDataChange(this, point, null);
+    });
+    switch (mode) {
+      case Mode.DEFAULT:
+        if (oldEventComponent && oldEditEventComponent) {
+          replace(this._eventComponent, oldEventComponent);
+          replace(this._editEventComponent, oldEditEventComponent);
+          this._replaceEditToEvent();
+        } else {
+          render(this._container, this._eventComponent, RenderPosition.BEFOREEND);
+        }
+        break;
+      case Mode.EDIT:
+        if (oldEventComponent && oldEditEventComponent) {
+          replace(this._eventComponent, oldEventComponent);
+          replace(this._editEventComponent, oldEditEventComponent);
+          this._replaceEventToEdit();
+        } else {
+          render(this._container, this._eventComponent, RenderPosition.BEFOREEND);
+        }
+        break;
+      case Mode.ADDING:
+        if (oldEditEventComponent && oldEventComponent) {
+          remove(oldEventComponent);
+          remove(oldEditEventComponent);
+        }
+        document.addEventListener(`keydown`, this._onEscKeyDown);
+        render(this._container, this._editEventComponent, RenderPosition.AFTERBEGIN);
+        break;
     }
-    render(this._container, this._eventComponent);
   }
 
   _replaceEditToEvent() {
