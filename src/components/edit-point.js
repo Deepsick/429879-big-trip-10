@@ -9,12 +9,12 @@ import PointModel from '../models/point';
 
 import AbstractSmartComponent from './abstract-smart-component';
 
-const createoffersMarkup = (offers) => {
-  return offers.map((offer) => {
+const createoffersMarkup = (offers, availableOffers) => {
+  return availableOffers.map((offer) => {
     const {title, price} = offer;
     return (
       `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${title}-1" type="checkbox" name="event-offer" value='${title}-${price}'>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${title}-1" type="checkbox" name="event-offer" ${offers.find((pointOffer) => pointOffer.title === offer.title) ? `checked` : ``} value='${title}-${price}'>
         <label class="event__offer-label" for="event-offer-${title}-1">
           <span class="event__offer-title">${title}</span>
           &plus;
@@ -25,7 +25,7 @@ const createoffersMarkup = (offers) => {
   });
 };
 
-const createOfferSection = (isAdd, offers) => {
+const createOfferSection = (isAdd, offers, availableOffers) => {
   if (isAdd) {
     return ``;
   }
@@ -35,7 +35,7 @@ const createOfferSection = (isAdd, offers) => {
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
       <div class="event__available-offers">
-        ${createoffersMarkup(offers).join(``)}
+        ${createoffersMarkup(offers, availableOffers).join(``)}
       </div>
     </section>`
   );
@@ -70,7 +70,7 @@ const createRollupButtonMarkup = (isAdd) => {
 };
 
 const createDatalist = (destinations) => {
-  return destinations.map((destination) => `<option value="${destination}"></option>`);
+  return destinations.map((destination) => `<option value="${destination.name}"></option>`);
 };
 
 const createPicturesMarkup = (pictures) => {
@@ -103,7 +103,7 @@ const createDescription = (isAdd, destination) => {
   );
 };
 
-export const createEditPointTemplate = ({type, destination, dateFrom, dateTo, price, isFavorite, offers, isAdd}, destinations, externalData) => {
+export const createEditPointTemplate = ({type, destination, dateFrom, dateTo, price, isFavorite, offers, availableOffers, isAdd}, destinations, externalData) => {
   const {name} = destination;
 
   const deleteButtonText = externalData.DELETE;
@@ -217,16 +217,17 @@ export const createEditPointTemplate = ({type, destination, dateFrom, dateTo, pr
     </header>
 
     <section class="event__details">
-      ${createOfferSection(isAdd, offers)}
+      ${createOfferSection(isAdd, offers, availableOffers)}
       ${createDescription(isAdd, destination)}
     </section>
   </form>`;
 };
 
-const parseFormData = (formData, id, isFavorite) => {
+const parseFormData = (formData, isFavorite, destinations) => {
   const dateFrom = formData.get(`event-start-time`);
   const dateTo = formData.get(`event-end-time`);
   const offers = formData.getAll(`event-offer`);
+  const preparedDestination = destinations.find((destination) => destination.name === formData.get(`event-destination`));
   const preparedOffers = offers.map((offer) => {
     const [title, price] = offer.split(`-`);
     return {
@@ -234,13 +235,12 @@ const parseFormData = (formData, id, isFavorite) => {
       price,
     };
   });
-
+  console.log(formData.get(`event-price`));
   return new PointModel({
-    id,
     'base_price': formData.get(`event-price`),
     'date_from': dateFrom,
     'date_to': dateTo,
-    'destination': formData.get(`event-destination`),
+    'destination': preparedDestination,
     'is_favorite': isFavorite,
     'type': formData.get(`event-type`),
     'offers': preparedOffers,
@@ -308,8 +308,12 @@ export default class EditPoint extends AbstractSmartComponent {
 
   getData() {
     const form = this.getElement();
+    console.log(form);
     const formData = new FormData(form);
-    return parseFormData(formData, this._point.id, this._point.isFavorite);
+    for (let [key, value] of formData) {
+      console.log(key, value);
+    }
+    return parseFormData(formData, this._point.isFavorite, this._destinations);
   }
 
   setData(data) {

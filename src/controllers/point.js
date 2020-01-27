@@ -49,9 +49,9 @@ export default class PointController {
       this._replaceEventToEdit();
       document.addEventListener(`keydown`, this._onEscKeyDown);
     });
+    point.availableOffers = this._offersModel.getTypeOffers(point.type).offers;
+    this._editEventComponent = new EditEventComponent(point, this._destinationsModel.getDestinations());
 
-    this._editEventComponent = new EditEventComponent(point, this._destinationsModel.getDestinationNames());
-    this._editEventComponent.applyFlatpickrs();
     this._editEventComponent.setEditButtonClickHandler(() => {
       this._replaceEditToEvent();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
@@ -78,7 +78,7 @@ export default class PointController {
         .value;
       const offers = this._offersModel.getTypeOffers(type).offers;
       newPoint.type = type;
-      newPoint.offers = offers;
+      newPoint.availableOffers = offers;
       this._onDataChange(this, point, newPoint, Mode.EDIT, false);
     });
 
@@ -138,7 +138,7 @@ export default class PointController {
   _replaceEventToEdit() {
     this._onViewChange();
     replace(this._editEventComponent, this._eventComponent);
-
+    this._editEventComponent.applyFlatpickrs();
     this._mode = Mode.EDIT;
   }
 

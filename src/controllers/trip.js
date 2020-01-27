@@ -147,7 +147,6 @@ export default class TripController {
           this._updatePoints();
         });
     } else {
-      console.log(pointController, oldData, newData, mode, isSave);
       if (isSave) {
         this._api.updatePoint(oldData.id, newData);
       }
