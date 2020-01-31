@@ -1,20 +1,28 @@
 export default class Destination {
-  constructor(data) {
-    this.description = data.description;
-    this.name = data.name;
-    this.pictures = data.pictures;
+  constructor(destination) {
+    this.description = destination.description;
+    this.name = destination.name;
+    this.pictures = destination.pictures;
   }
 
-  static parseDestination(data) {
-    return new Destination(data);
+  toRAW() {
+    return {
+      description: this.description,
+      name: this.name,
+      pictures: this.pictures,
+    };
   }
 
-  static parseDestinations(data) {
-    return data.map(Destination.parseDestination);
+  static parseDestination(destination) {
+    return new Destination(destination);
   }
 
-  static clone(data) {
-    return new Destination(data.toRAW());
+  static parseDestinations(destinations) {
+    return destinations.map(Destination.parseDestination);
+  }
+
+  static clone(destination) {
+    return new Destination(destination.toRAW());
   }
 }
 

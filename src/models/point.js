@@ -1,16 +1,18 @@
 import moment from 'moment';
 
+import {compareDates} from '../utils/date';
+
 export default class Point {
-  constructor(data) {
-    this.id = data.id;
-    this.price = +data.base_price;
-    this.dateFrom = moment(new Date(data.date_from));
-    this.dateTo = moment(new Date(data.date_to));
-    this.destination = data.destination;
-    this.isFavorite = data.is_favorite;
-    this.type = data.type;
-    this.duration = moment(this.dateTo).diff(this.dateFrom);
-    this.offers = data.offers;
+  constructor(point) {
+    this.id = point.id;
+    this.price = +point.base_price;
+    this.dateFrom = moment(new Date(point.date_from));
+    this.dateTo = moment(new Date(point.date_to));
+    this.destination = point.destination;
+    this.isFavorite = point.is_favorite;
+    this.type = point.type;
+    this.duration = compareDates(this.dateTo, this.dateFrom);
+    this.offers = point.offers;
   }
 
   toRAW() {
@@ -21,7 +23,7 @@ export default class Point {
         price: +price,
       };
     });
-    
+
     return {
       'id': this.id,
       'base_price': this.price,
@@ -34,15 +36,15 @@ export default class Point {
     };
   }
 
-  static parsePoint(data) {
-    return new Point(data);
+  static parsePoint(point) {
+    return new Point(point);
   }
 
-  static parsePoints(data) {
-    return data.map(Point.parsePoint);
+  static parsePoints(points) {
+    return points.map(Point.parsePoint);
   }
 
-  static clone(data) {
-    return new Point(data.toRAW());
+  static clone(point) {
+    return new Point(point.toRAW());
   }
 }

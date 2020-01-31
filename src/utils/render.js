@@ -11,7 +11,6 @@ export const createElement = (template) => {
   return container.firstChild;
 };
 
-
 export const render = (node, component, place = RenderPosition.BEFOREEND) => {
   switch (place) {
     case RenderPosition.AFTERBEGIN:

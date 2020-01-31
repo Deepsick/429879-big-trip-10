@@ -1,19 +1,26 @@
 export default class Offer {
-  constructor(data) {
-    this.type = data.type;
-    this.offers = data.offers;
+  constructor(offer) {
+    this.type = offer.type;
+    this.offers = offer.offers;
   }
 
-  static parseOffer(data) {
-    return new Offer(data);
+  toRAW() {
+    return {
+      type: this.type,
+      offers: this.offers,
+    };
   }
 
-  static parseOffers(data) {
-    return data.map(Offer.parseOffer);
+  static parseOffer(offer) {
+    return new Offer(offer);
   }
 
-  static clone(data) {
-    return new Offer(data.toRAW());
+  static parseOffers(offers) {
+    return offers.map(Offer.parseOffer);
+  }
+
+  static clone(offer) {
+    return new Offer(offer.toRAW());
   }
 }
 

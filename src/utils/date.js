@@ -1,5 +1,11 @@
 import moment from 'moment';
+
 import {TimeRatio} from '../const';
+
+
+const addZeroToTime = (time) => {
+  return `${time < TimeRatio.DOUBLE_DIGIT ? `0` + time : time}`;
+};
 
 export const formatFlatpickrDate = (date) => {
   return moment(new Date(date)).format(`DD/MM/YYYY HH:mm`);
@@ -21,9 +27,7 @@ export const formatStatisticsDuration = (duration) => {
   return Math.ceil(moment.duration(duration).asHours());
 };
 
-const addZeroToTime = (time) => {
-  return `${time < TimeRatio.DOUBLE_DIGIT ? `0` + time : time}`;
-};
+export const compareDates = (a, b) => moment(a).diff(b);
 
 export const formatDuration = (duration) => {
   let minutes = Math.floor(duration / TimeRatio.SECOND_IN_MILLISECONDS / TimeRatio.MINUTES_IN_HOUR);

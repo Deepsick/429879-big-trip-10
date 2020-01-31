@@ -17,11 +17,11 @@ const createOfferTemplate = (offer) => {
 
 const generateOffersMarkup = (offers) => {
   const offerNodes = [];
-  for (let i = 0; i < offers.length; i++) {
-    if (i === OFFER_COUNT) {
+  for (let [index, offer] of Object.entries(offers)) {
+    if (index === OFFER_COUNT) {
       break;
     }
-    offerNodes.push(createOfferTemplate(offers[i]));
+    offerNodes.push(createOfferTemplate(offer));
   }
 
   return offerNodes;

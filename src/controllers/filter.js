@@ -6,7 +6,6 @@ export default class Filter {
   constructor(node, pointsModel) {
     this._node = node;
     this._pointsModel = pointsModel;
-
     this._activeFilterType = FilterType.EVERYTHING;
     this._filterComponent = null;
 

@@ -1,7 +1,18 @@
+const STORE_POINTS_PREFIX = `points-localstorage`;
+const STORE_DESTINATIONS_PREFIX = `destinations-localstorage`;
+const STORE_OFFERS_PREFIX = `offers-localstorage`;
+const STORE_VER = `v1`;
+
 export const FilterType = {
   EVERYTHING: `everything`,
   FUTURE: `future`,
   PAST: `past`,
+};
+
+export const SortType = {
+  EVENT: `sort-event`,
+  TIME: `sort-time`,
+  PRICE: `sort-price`,
 };
 
 export const TimeRatio = {
@@ -56,8 +67,12 @@ export const Route = {
   OFFERS: `offers`,
 };
 
-export const AUTHORIZATION = `Basic azaza=`;
+export const AUTHORIZATION = `Basic jaskdjcodhwi=`;
 export const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
+
+export const STORE_POINTS_NAME = `${STORE_POINTS_PREFIX}-${STORE_VER}`;
+export const STORE_DESTINATIONS_NAME = `${STORE_DESTINATIONS_PREFIX}-${STORE_VER}`;
+export const STORE_OFFERS_NAME = `${STORE_OFFERS_PREFIX}-${STORE_VER}`;
 
 export const FILTER_ID_PREFIX = `filter-`;
 export const ACTIVE_MENU_ITEM_CLASS = `trip-tabs__btn--active`;
@@ -89,16 +104,19 @@ export const TitlePlaceholder = {
 };
 
 export const DEFAULT_TRIP_DAY = {
-  count: 0,
-  date: new Date().toISOString(),
+  count: ``,
+  date: ``,
 };
 
 export const ButtonText = {
   CANCEL: `Cancel`,
   DELETE: `Delete`,
   SAVE: `Save`,
+  SAVING: `Saving...`,
+  DELETING: `Deleting...`,
 };
 
 export const EVENT_COUNTER = 1;
-
-
+export const DEBOUNCE_TIMEOUT = 500;
+export const SHAKE_ANIMATION_TIMEOUT = 600;
+export const MSECONDS_IN_SECOND = 1000;

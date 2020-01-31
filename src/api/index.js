@@ -1,8 +1,8 @@
-import {Method, Route} from './const';
+import {Method, Route} from '../const';
 
-import Point from './models/point.js';
-import Destination from './models/destination';
-import Offer from './models/offer';
+import Point from '../models/point.js';
+import Destination from '../models/destination';
+import Offer from '../models/offer';
 
 const checkStatus = (response) => {
   const {status, statusText} = response;
@@ -36,11 +36,11 @@ const Api = class {
     .then(Point.parsePoint);
   }
 
-  updatePoint(id, data) {
+  updatePoint(id, point) {
     return this._load({
       route: `${Route.POINTS}/${id}`,
       method: Method.PUT,
-      body: JSON.stringify(data.toRAW()),
+      body: JSON.stringify(point.toRAW()),
       headers: new Headers({'Content-Type': `application/json`}),
     })
     .then((response) => response.json())
@@ -61,6 +61,16 @@ const Api = class {
     return this._load({route: Route.OFFERS})
       .then((response) => response.json())
       .then(Offer.parseOffers);
+  }
+
+  sync(points) {
+    return this._load({
+      url: `points/sync`,
+      method: Method.POST,
+      body: JSON.stringify(points),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+      .then((response) => response.json());
   }
 
   _load({route, method = Method.GET, body = null, headers = new Headers()}) {

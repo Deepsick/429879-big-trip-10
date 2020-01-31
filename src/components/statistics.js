@@ -7,15 +7,16 @@ import {formatStatisticsDuration} from '../utils/date';
 
 import AbstractComponent from "./abstract-component";
 
+const START_VALUE = 0;
 
 const getDateByTypes = (types, points) => {
   const dataTypes = [...types].map((type) => {
     return {
       name: type,
       isTransport: isTransport(type),
-      sum: 0,
-      count: 0,
-      time: 0,
+      sum: START_VALUE,
+      count: START_VALUE,
+      time: START_VALUE,
     };
   });
   points.forEach((point) => {

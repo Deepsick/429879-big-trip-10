@@ -18,28 +18,35 @@ const createRouteInfoTemplate = (date, route, price) => (
 );
 
 const createDate = (points) => {
-  const dateFrom = formatDateToDay(points[0].dateFrom);
-  const dateTo = formatDateToDay(getLastArrayElement(points).dateTo);
+  if (points.length) {
+    const dateFrom = formatDateToDay(points[0].dateFrom);
+    const dateTo = formatDateToDay(getLastArrayElement(points).dateTo);
 
-  return `${dateFrom}&nbsp;${ROUTE_SEPARATOR}&nbsp;${dateTo}`;
+    return `${dateFrom}&nbsp;${ROUTE_SEPARATOR}&nbsp;${dateTo}`;
+  }
+  return ``;
 };
 
-const createRoute = (destinations) => {
-  const firstDestination = destinations[0];
-  const lastDestination = getLastArrayElement(destinations);
-  const middleDestination = destinations.length <= ROUTE_COUNT ? destinations[1] : ROUTE_REPLACER;
+const createRoute = (points) => {
+  if (points.length) {
+    const firstDestination = points[0].destination.name;
+    const lastDestination = getLastArrayElement(points).destination.name;
+    const middleDestination = points.length <= ROUTE_COUNT ? points[1].destination.name : ROUTE_REPLACER;
 
-  return `${firstDestination} ${ROUTE_SEPARATOR} ${middleDestination} ${ROUTE_SEPARATOR} ${lastDestination}`;
+    return `${firstDestination} ${ROUTE_SEPARATOR} ${middleDestination} ${ROUTE_SEPARATOR} ${lastDestination}`;
+  }
+
+  return ``;
 };
 
 const getTotalPrice = (points) => {
   let totalPrice = 0;
   points.forEach((point) => {
     const {offers, price} = point;
-    totalPrice += price;
+    totalPrice += +price;
 
     offers.forEach((offer) => {
-      totalPrice += offer.price;
+      totalPrice += +offer.price;
     });
   });
 
@@ -47,17 +54,31 @@ const getTotalPrice = (points) => {
 };
 
 export default class RouteInfo extends AbstractComponent {
-  constructor(points, destinations) {
+  constructor(points) {
     super();
     this._points = points;
-    this._destinations = destinations;
-    this._route = createRoute(this._destinations);
+    this._route = createRoute(this._points);
     this._date = createDate(this._points);
     this._totalPrice = getTotalPrice(this._points);
   }
 
   getTemplate() {
     return createRouteInfoTemplate(this._date, this._route, this._totalPrice);
+  }
+
+  update(points) {
+    const oldElement = this.getElement();
+    const parent = oldElement.parentElement;
+
+    this.removeElement();
+
+    this._points = points;
+    this._route = createRoute(this._points);
+    this._date = createDate(this._points);
+    this._totalPrice = getTotalPrice(this._points);
+    const newElement = this.getElement();
+
+    parent.replaceChild(newElement, oldElement);
   }
 }
 
