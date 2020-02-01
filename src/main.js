@@ -82,6 +82,7 @@ apiWithProvider
           break;
         case MenuItem.STATS:
           tripController.hide();
+          statisticsComponent.update();
           statisticsComponent.show();
           break;
       }

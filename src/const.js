@@ -67,7 +67,7 @@ export const Route = {
   OFFERS: `offers`,
 };
 
-export const AUTHORIZATION = `Basic jaskdjcodhwi=`;
+export const AUTHORIZATION = `Basic weruqedjsh=`;
 export const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
 
 export const STORE_POINTS_NAME = `${STORE_POINTS_PREFIX}-${STORE_VER}`;

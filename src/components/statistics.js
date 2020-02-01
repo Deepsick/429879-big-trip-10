@@ -349,4 +349,15 @@ export default class Statistics extends AbstractComponent {
       this._timeChart = null;
     }
   }
+
+  update() {
+    const oldElement = this.getElement();
+    const parent = oldElement.parentElement;
+    this.removeElement();
+
+    this._renderCharts();
+    const newElement = this.getElement();
+
+    parent.replaceChild(newElement, oldElement);
+  }
 }
