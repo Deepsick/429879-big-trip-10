@@ -11,7 +11,8 @@ export default class Points {
   }
 
   getPoints() {
-    return getPointsByFilter(this._points, this._activeFilterType);
+    return getPointsByFilter(this._points, this._activeFilterType)
+      .sort((left, right) => (left.dateFrom).diff(right.dateFrom));
   }
 
   getAllPoints() {
@@ -46,6 +47,7 @@ export default class Points {
     if (index === -1) {
       return false;
     }
+
     this._points = [].concat(this._points.slice(0, index), this._points.slice(index + 1));
     this._callHandlers(this._dataChangeHandlers);
     return true;

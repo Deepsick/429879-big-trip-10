@@ -1,57 +1,102 @@
 
-import {MenuItem} from './const';
-import {render, RenderPosition} from './utils/render';
+import {MenuItem, AUTHORIZATION, END_POINT, STORE_POINTS_NAME, STORE_DESTINATIONS_NAME, STORE_OFFERS_NAME} from './const';
+import {render, remove, RenderPosition} from './utils/render';
 
-import MenuComponent from './components/menu';
+import Api from './api';
+import Store from './api/store.js';
+import Provider from './api/provider.js';
+
+import SiteMenuComponent from './components/site-menu';
 import RouteInfoComponent from './components/route-info';
 import StatisticsComponent from './components/statistics';
+import LoadingTripDays from './components/loading-trip-days';
 
 import TripController from './controllers/trip';
 import FilterController from './controllers/filter';
 
-import {generateMenu} from './mock/menu';
-import {generateEvents} from './mock/event';
-
 import PointsModel from './models/points';
+import DestinationsModel from './models/destinations';
+import OffersModel from './models/offers';
 
-const EVENT_COUNT = 3;
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`);
+});
 
-
-const tripInfoElement = document.querySelector(`.trip-info`);
+const api = new Api(END_POINT, AUTHORIZATION);
+const pointsStore = new Store(STORE_POINTS_NAME, window.localStorage);
+const destinationsStore = new Store(STORE_DESTINATIONS_NAME, window.localStorage);
+const offersStore = new Store(STORE_OFFERS_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, pointsStore, destinationsStore, offersStore);
+const tripMainElement = document.querySelector(`.trip-main`);
 const menuTitleElement = document.querySelector(`.trip-controls h2:first-child`);
 const filtersTitleElement = document.querySelector(`.trip-controls h2:last-child`);
 const tripEventsElement = document.querySelector(`.trip-events`);
-
-render(tripInfoElement, new RouteInfoComponent(), RenderPosition.AFTERBEGIN);
-
-const menu = generateMenu();
-const siteMenuComponent = new MenuComponent(menu);
-render(menuTitleElement, siteMenuComponent, RenderPosition.AFTEREND);
+const addPointButton = document.querySelector(`.trip-main__event-add-btn`);
+const siteMenuComponent = new SiteMenuComponent();
+const loadingTripDaysComponent = new LoadingTripDays();
 
 const pointsModel = new PointsModel();
-const events = generateEvents(EVENT_COUNT);
-pointsModel.setPoints(events);
+const destinationsModel = new DestinationsModel();
+const offersModel = new OffersModel();
 
-const filterController = new FilterController(filtersTitleElement, pointsModel);
-filterController.render();
+render(menuTitleElement, siteMenuComponent, RenderPosition.AFTEREND);
+render(tripEventsElement, loadingTripDaysComponent);
 
-const statisticsComponent = new StatisticsComponent(pointsModel);
-render(tripEventsElement, statisticsComponent, RenderPosition.BEFOREEND);
+apiWithProvider
+  .getPoints()
+  .then((points) => {
+    pointsModel.setPoints(points);
 
-const tripController = new TripController(tripEventsElement, pointsModel);
-statisticsComponent.hide();
-tripController.render();
+    return apiWithProvider.getDestinations();
+  })
+  .then((destinations) => {
+    destinationsModel.setDestinations(destinations);
 
-siteMenuComponent.setClickHandler((menuItem) => {
-  switch (menuItem) {
-    case MenuItem.TABLE:
-      tripController.show();
-      statisticsComponent.hide();
-      break;
-    case MenuItem.STATS:
-      tripController.hide();
-      statisticsComponent.show();
-      break;
+    return apiWithProvider.getOffers();
+  })
+  .then((offers) => {
+    offersModel.setOffers(offers);
+    const routeInfoComponent = new RouteInfoComponent(pointsModel.getPoints());
+    render(tripMainElement, routeInfoComponent, RenderPosition.AFTERBEGIN);
+    remove(loadingTripDaysComponent);
+    const tripController = new TripController(tripEventsElement, pointsModel, destinationsModel, offersModel, apiWithProvider, routeInfoComponent);
+    tripController.render();
+    const statisticsComponent = new StatisticsComponent(pointsModel);
+    render(tripEventsElement, statisticsComponent, RenderPosition.BEFOREEND);
+    const filterController = new FilterController(filtersTitleElement, pointsModel);
+    filterController.render();
+
+    statisticsComponent.hide();
+
+    addPointButton.addEventListener(`click`, () => {
+      tripController.createPoint();
+    });
+
+    siteMenuComponent.setClickHandler((menuItem) => {
+      siteMenuComponent.setActiveItem(menuItem);
+      const tabText = menuItem.textContent.toLowerCase();
+      switch (tabText) {
+        case MenuItem.TABLE:
+          tripController.show();
+          statisticsComponent.hide();
+          break;
+        case MenuItem.STATS:
+          tripController.hide();
+          statisticsComponent.show();
+          break;
+      }
+    });
+  });
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+
+  if (!apiWithProvider.getSynchronize()) {
+    apiWithProvider.sync();
   }
+});
+
+window.addEventListener(`offline`, () => {
+  document.title += ` [offline]`;
 });
 

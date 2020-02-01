@@ -1,13 +1,11 @@
 import FiltersComponent from '../components/filters';
 import {FilterType} from '../const';
 import {render, replace, RenderPosition} from '../utils/render.js';
-import {generateFilters} from '../mock/filter';
 
 export default class Filter {
   constructor(node, pointsModel) {
     this._node = node;
     this._pointsModel = pointsModel;
-
     this._activeFilterType = FilterType.EVERYTHING;
     this._filterComponent = null;
 
@@ -21,7 +19,10 @@ export default class Filter {
     const node = this._node;
     const oldComponent = this._filterComponent;
 
-    const filters = generateFilters(FilterType, this._activeFilterType);
+    const filters = Object.values(FilterType).map((filter) => ({
+      name: filter,
+      checked: filter === this._activeFilterType,
+    }));
     this._filterComponent = new FiltersComponent(filters);
     this._filterComponent.setFilterChangeHandler(this._onFilterChange);
     if (oldComponent) {
