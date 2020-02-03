@@ -42,7 +42,7 @@ export default class Filters extends AbstractComponent {
     this
       .getElement()
       .addEventListener(`click`, (evt) => {
-        evt.preventDefault();;
+        evt.preventDefault();
         if (evt.target.tagName.toLowerCase() === TagName.LABEL) {
           const filterName = getFilterNameById(evt.target.htmlFor);
           handler(filterName);
