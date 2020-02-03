@@ -219,6 +219,7 @@ export default class TripController {
               });
               this._updatePoints();
             }
+            pointController.render(newData, PointControllerMode.EDIT);
             this._routeInfoComponent.update(this._pointsModel.getAllPoints());
           })
           .catch(() => {
