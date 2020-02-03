@@ -7,7 +7,7 @@ export const formatToTitleCase = (word) => {
 
 export const isEscKey = (key) => ESCAPE_NAMES.includes(key);
 
-export const getLastArrayElement = (array) => array[array.length - 1];
+export const getLastElement = (points) => points[points.length - 1];
 
 export const getTitlePlaceholder = (action) => {
   return Object.values(Transport).includes(action) ? TitlePlaceholder.TRANSPORT : TitlePlaceholder.STATION;
@@ -15,4 +15,4 @@ export const getTitlePlaceholder = (action) => {
 
 export const isTransport = (type) => Object.values(Transport).includes(type);
 
-export const getUniqueItems = (array) => Array.from(new Set(array));
+export const getUniqueItems = (points) => Array.from(new Set(points));

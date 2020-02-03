@@ -1,5 +1,5 @@
 
-import {MenuItem, AUTHORIZATION, END_POINT, STORE_POINTS_NAME, STORE_DESTINATIONS_NAME, STORE_OFFERS_NAME} from './const';
+import {MenuItem, AUTHORIZATION, END_POINT, StoreName} from './const';
 import {render, remove, RenderPosition} from './utils/render';
 
 import Api from './api';
@@ -23,9 +23,9 @@ window.addEventListener(`load`, () => {
 });
 
 const api = new Api(END_POINT, AUTHORIZATION);
-const pointsStore = new Store(STORE_POINTS_NAME, window.localStorage);
-const destinationsStore = new Store(STORE_DESTINATIONS_NAME, window.localStorage);
-const offersStore = new Store(STORE_OFFERS_NAME, window.localStorage);
+const pointsStore = new Store(StoreName.POINTS, window.localStorage);
+const destinationsStore = new Store(StoreName.DESTINATIONS, window.localStorage);
+const offersStore = new Store(StoreName.OFFERS, window.localStorage);
 const apiWithProvider = new Provider(api, pointsStore, destinationsStore, offersStore);
 const tripMainElement = document.querySelector(`.trip-main`);
 const menuTitleElement = document.querySelector(`.trip-controls h2:first-child`);
@@ -56,7 +56,7 @@ apiWithProvider
   })
   .then((offers) => {
     offersModel.setOffers(offers);
-    const routeInfoComponent = new RouteInfoComponent(pointsModel.getPoints());
+    const routeInfoComponent = new RouteInfoComponent(pointsModel.getPoints(), offersModel);
     render(tripMainElement, routeInfoComponent, RenderPosition.AFTERBEGIN);
     remove(loadingTripDaysComponent);
     const tripController = new TripController(tripEventsElement, pointsModel, destinationsModel, offersModel, apiWithProvider, routeInfoComponent);
@@ -87,15 +87,19 @@ apiWithProvider
           break;
       }
     });
+
+    window.addEventListener(`online`, () => {
+      document.title = document.title.replace(` [offline]`, ``);
+
+      if (!apiWithProvider.getSynchronize()) {
+        apiWithProvider.sync()
+          .then((points) => {
+            pointsModel.setPoints(points);
+            tripController.updatePoints();
+          });
+      }
+    });
   });
-
-window.addEventListener(`online`, () => {
-  document.title = document.title.replace(` [offline]`, ``);
-
-  if (!apiWithProvider.getSynchronize()) {
-    apiWithProvider.sync();
-  }
-});
 
 window.addEventListener(`offline`, () => {
   document.title += ` [offline]`;

@@ -4,11 +4,7 @@ const getFuturePoints = (points, date) => {
   return points.filter((point) => {
     const {dateFrom} = point;
 
-    if (!dateFrom) {
-      return false;
-    }
-
-    return dateFrom > date;
+    return dateFrom && dateFrom > date;
   });
 };
 
@@ -16,11 +12,7 @@ const getPastPoints = (points, date) => {
   return points.filter((point) => {
     const {dateTo} = point;
 
-    if (!dateTo) {
-      return false;
-    }
-
-    return dateTo < date;
+    return dateTo && dateTo < date;
   });
 };
 

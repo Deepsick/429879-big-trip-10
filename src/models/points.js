@@ -16,7 +16,8 @@ export default class Points {
   }
 
   getAllPoints() {
-    return this._points;
+    return getPointsByFilter(this._points, FilterType.EVERYTHING)
+      .sort((left, right) => (left.dateFrom).diff(right.dateFrom));
   }
 
   setPoints(points) {

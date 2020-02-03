@@ -3,6 +3,8 @@ import {OFFER_COUNT} from '../const';
 import {getTitlePlaceholder, formatToTitleCase} from '../utils/common';
 import {formatTime, formatDuration, formatTagTime} from '../utils/date';
 
+const START_INDEX = 0;
+
 const createOfferTemplate = (offer) => {
   const {title, price} = offer;
 
@@ -15,22 +17,23 @@ const createOfferTemplate = (offer) => {
   );
 };
 
-const generateOffersMarkup = (offers) => {
+const generateOffersMarkup = (offers, availableOffers) => {
   const offerNodes = [];
-  for (let [index, offer] of Object.entries(offers)) {
-    if (index === OFFER_COUNT) {
-      break;
-    }
+  const filteredOffers = availableOffers.filter((availableOffer) => {
+    return offers.some((offer) => availableOffer.title === offer.title);
+  });
+
+  filteredOffers.slice(START_INDEX, OFFER_COUNT).forEach((offer) => {
     offerNodes.push(createOfferTemplate(offer));
-  }
+  });
 
   return offerNodes;
 };
 
 
 const createPointTemplate = (point) => {
-  const {type, destination, dateFrom, dateTo, price, offers, duration} = point;
-  const offersMarkup = generateOffersMarkup(offers).join(``);
+  const {type, destination, dateFrom, dateTo, price, offers, availableOffers, duration} = point;
+  const offersMarkup = generateOffersMarkup(offers, availableOffers).join(``);
 
   return `<li class="trip-events__item">
     <div class="event">
@@ -63,14 +66,14 @@ const createPointTemplate = (point) => {
   </li>`;
 };
 
-export default class Event extends AbstractComponent {
-  constructor(event) {
+export default class Point extends AbstractComponent {
+  constructor(point) {
     super();
-    this._event = event;
+    this._point = point;
   }
 
   getTemplate() {
-    return createPointTemplate(this._event);
+    return createPointTemplate(this._point);
   }
 
   setEditButtonClickHandler(handler) {
@@ -78,5 +81,13 @@ export default class Event extends AbstractComponent {
       .getElement()
       .querySelector(`.event__rollup-btn`)
       .addEventListener(`click`, handler);
+  }
+
+  addAnimation(animation) {
+    this.getElement().style.animation = animation;
+  }
+
+  removeAnimation() {
+    this.getElement().style.animation = ``;
   }
 }

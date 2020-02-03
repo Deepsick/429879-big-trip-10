@@ -6,15 +6,13 @@ import 'flatpickr/dist/flatpickr.css';
 
 import {getTitlePlaceholder, formatToTitleCase} from '../utils/common';
 import {formatFlatpickrDate} from '../utils/date';
-import {ButtonText, DEBOUNCE_TIMEOUT, Station, Transport} from '../const';
+import {ButtonText, DEBOUNCE_TIMEOUT, Station, Transport, CHECK_TYPE_PREFIX} from '../const';
 
 import {Mode} from '../controllers/point';
 
 import PointModel from '../models/point';
 
 import AbstractSmartComponent from './abstract-smart-component';
-
-const CHECK_TYPE_PREFIX = `-in`;
 
 const createoffersMarkup = (offers, availableOffers) => {
   return availableOffers.map((offer) => {
@@ -117,7 +115,7 @@ const createTypeList = (type) => {
   });
 
   const activityInputs = Object.values(Station).map((activityType) => {
-    if (activityType === `check`) {
+    if (activityType === Station.CHECK) {
       activityType += CHECK_TYPE_PREFIX;
     }
     return (
@@ -279,7 +277,7 @@ export default class EditPoint extends AbstractSmartComponent {
       this._flatpickrs.push(flatpickr(dateElement, {
         allowInput: true,
         defaultDate: dateElement.id.includes(`event-end-time`) ? formatFlatpickrDate(this._point.dateTo) : formatFlatpickrDate(this._point.dateFrom),
-        dateFormat: `d/m/Y h:i`,
+        dateFormat: `d/m/Y H:i`,
       }));
     });
   }
@@ -300,6 +298,7 @@ export default class EditPoint extends AbstractSmartComponent {
   setData(data) {
     this._externalData = Object.assign({}, ButtonText, data);
     this.rerender();
+    this.applyFlatpickrs();
   }
 
   setTypeChangeHandler(handler) {
@@ -371,7 +370,6 @@ export default class EditPoint extends AbstractSmartComponent {
       .querySelector(`.event__reset-btn`)
       .addEventListener(`click`, () => {
         handler();
-        this.removeFlatPickrs();
       });
 
     this._deleteButtonClickHandler = handler;
@@ -383,7 +381,6 @@ export default class EditPoint extends AbstractSmartComponent {
       .addEventListener(`submit`, (evt) => {
         evt.preventDefault();
         handler();
-        this.removeFlatPickrs();
       });
 
     this._submitHandler = handler;
@@ -426,5 +423,13 @@ export default class EditPoint extends AbstractSmartComponent {
         input.disabled = false;
       });
     }
+  }
+
+  addAnimation(animation) {
+    this.getElement().style.animation = animation;
+  }
+
+  removeAnimation() {
+    this.getElement().style.animation = ``;
   }
 }

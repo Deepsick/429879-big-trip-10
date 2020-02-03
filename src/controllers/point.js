@@ -4,10 +4,10 @@ import _ from 'lodash';
 
 import {render, replace, remove, RenderPosition} from '../utils/render';
 import {isEscKey} from '../utils/common';
-import {ButtonText, SHAKE_ANIMATION_TIMEOUT, MSECONDS_IN_SECOND} from '../const';
+import {ButtonText, SHAKE_ANIMATION_TIMEOUT, TimeRatio} from '../const';
 
-import EditEventComponent from '../components/edit-point';
-import EventComponent from '../components/point';
+import EditPointComponent from '../components/edit-point';
+import PointComponent from '../components/point';
 
 import PointModel from '../models/point.js';
 
@@ -32,62 +32,63 @@ const createEmptyPoint = () => ({
 export const EmptyPoint = createEmptyPoint();
 
 export default class PointController {
-  constructor(container, destinationsModel, offersModel, onDataChange, onViewChange, onFormChange) {
+  constructor(container, destinationsModel, offersModel, dataChangeHandler, viewChangeHandler, formChangeHandler) {
     this._container = container;
-    this._onDataChange = onDataChange;
-    this._onViewChange = onViewChange;
-    this._onFormChange = onFormChange;
+    this._dataChangeHandler = dataChangeHandler;
+    this._viewChangeHandler = viewChangeHandler;
+    this._formChangeHandler = formChangeHandler;
     this._destinationsModel = destinationsModel;
     this._offersModel = offersModel;
     this._mode = Mode.DEFAULT;
     this._point = null;
 
-    this._eventComponent = null;
-    this._editEventComponent = null;
+    this._pointComponent = null;
+    this._editPointComponent = null;
 
-    this._onEscKeyDown = this._onEscKeyDown.bind(this);
+    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
   render(point, mode) {
-    const oldEventComponent = this._eventComponent;
-    const oldEditEventComponent = this._editEventComponent;
+    const oldPointComponent = this._pointComponent;
+    const oldEditPointComponent = this._editPointComponent;
     this._mode = mode;
     this._point = point;
+    this._point.availableOffers = this._offersModel.getTypeOffers(point.type).offers;
 
-    this._eventComponent = new EventComponent(point);
-    this._eventComponent.setEditButtonClickHandler(() => {
-      this._replaceEventToEdit();
-      document.addEventListener(`keydown`, this._onEscKeyDown);
-    });
-    point.availableOffers = this._offersModel.getTypeOffers(point.type).offers;
-    this._editEventComponent = new EditEventComponent(point, this._destinationsModel.getDestinations(), this._mode);
-    this._editEventComponent.enable();
-
-    this._editEventComponent.setEditButtonClickHandler(() => {
-      this._replaceEditToEvent();
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
+    this._pointComponent = new PointComponent(point);
+    this._pointComponent.setEditButtonClickHandler(() => {
+      this._replacePointToEdit();
+      document.addEventListener(`keydown`, this._escKeyDownHandler);
     });
 
-    this._editEventComponent.setSubmitHandler(() => {
-      const data = this._editEventComponent.getData();
-      this._editEventComponent.setData({
+    this._editPointComponent = new EditPointComponent(this._point, this._destinationsModel.getDestinations(), this._mode);
+    this._editPointComponent.enable();
+
+    this._editPointComponent.setEditButtonClickHandler(() => {
+      this._replaceEditToPoint();
+      document.removeEventListener(`keydown`, this._escKeyDownHandler);
+    });
+
+    this._editPointComponent.setSubmitHandler(() => {
+      const data = this._editPointComponent.getData();
+      this._editPointComponent.setData({
         SAVE: ButtonText.SAVING,
       });
       const offers = this._offersModel.getTypeOffers(data.type).offers;
       data.availableOffers = offers;
-      const currentMode = !_.isUndefined(point.isFavorite) ? Mode.DEFAULT : Mode.ADDING;
-      this._onDataChange(this, point, data, currentMode);
+      const currentMode = !_.isUndefined(this._point.isFavorite) ? Mode.DEFAULT : Mode.ADDING;
+      this._dataChangeHandler(this, this._point, data, currentMode);
     });
 
-    this._editEventComponent.setFavoriteButtonClickHandler(() => {
-      const newPoint = PointModel.clone(point);
+    this._editPointComponent.setFavoriteButtonClickHandler(() => {
+      const newPoint = PointModel.clone(this._point);
       newPoint.isFavorite = !newPoint.isFavorite;
-      this._onDataChange(this, point, newPoint, Mode.EDIT);
+      this._dataChangeHandler(this, this._point, newPoint, Mode.EDIT);
     });
 
-    this._editEventComponent.setTypeChangeHandler(() => {
-      const newPoint = PointModel.clone(point);
-      const type = this._editEventComponent
+    this._editPointComponent.setTypeChangeHandler(() => {
+      const newPoint = PointModel.clone(this._point);
+      const type = this._editPointComponent
         .getElement()
         .querySelector(`.event__type-input:checked`)
         .value;
@@ -95,12 +96,12 @@ export default class PointController {
       newPoint.type = type;
       newPoint.availableOffers = offers;
 
-      const currentMode = !_.isUndefined(point.isFavorite) ? Mode.EDIT : Mode.ADDING;
-      this._onDataChange(this, point, newPoint, currentMode, false);
+      const currentMode = !_.isUndefined(this._point.isFavorite) ? Mode.EDIT : Mode.ADDING;
+      this._dataChangeHandler(this, this._point, newPoint, currentMode, false);
     });
 
-    this._editEventComponent.setTimeInputsChangeHandler((evt) => {
-      const newPoint = PointModel.clone(point);
+    this._editPointComponent.setTimeInputsChangeHandler((evt) => {
+      const newPoint = PointModel.clone(this._point);
       const dateElement = evt.target;
       const date = evt.target.value;
       const convertedDate = moment(date, `DD/MM/YYYY HH:mm`);
@@ -110,20 +111,20 @@ export default class PointController {
       } else {
         newPoint.dateFrom = convertedDate;
       }
-      const currentMode = !_.isUndefined(point.isFavorite) ? Mode.EDIT : Mode.ADDING;
-      this._onDataChange(this, point, newPoint, currentMode, false);
+      const currentMode = !_.isUndefined(this._point.isFavorite) ? Mode.EDIT : Mode.ADDING;
+      this._dataChangeHandler(this, this._point, newPoint, currentMode, false);
     });
 
-    this._editEventComponent.setPriceChangeHandler((evt) => {
-      const newPoint = PointModel.clone(point);
+    this._editPointComponent.setPriceChangeHandler((evt) => {
+      const newPoint = PointModel.clone(this._point);
       const value = evt.target.value;
-      const currentMode = !_.isUndefined(point.isFavorite) ? Mode.EDIT : Mode.ADDING;
+      const currentMode = !_.isUndefined(this._point.isFavorite) ? Mode.EDIT : Mode.ADDING;
       newPoint.price = value;
-      this._onDataChange(this, point, newPoint, currentMode, false);
+      this._dataChangeHandler(this, this._point, newPoint, currentMode, false);
     });
 
-    this._editEventComponent.setOffersChangeHandler((evt) => {
-      const newPoint = PointModel.clone(point);
+    this._editPointComponent.setOffersChangeHandler((evt) => {
+      const newPoint = PointModel.clone(this._point);
       const value = evt.target.value;
       const [name, price] = value.split(`|`);
       const index = newPoint.offers.findIndex((offer) => offer.title === name);
@@ -135,69 +136,73 @@ export default class PointController {
       } else {
         newPoint.offers.splice(index, 1);
       }
-      const currentMode = !_.isUndefined(point.isFavorite) ? Mode.EDIT : Mode.ADDING;
-      this._onDataChange(this, point, newPoint, currentMode, false);
+      const currentMode = !_.isUndefined(this._point.isFavorite) ? Mode.EDIT : Mode.ADDING;
+      this._dataChangeHandler(this, this._point, newPoint, currentMode, false);
     });
 
-    this._editEventComponent.setDestinationInputChangeHandler(() => {
-      const newPoint = PointModel.clone(point);
-      const destination = this._editEventComponent
+    this._editPointComponent.setDestinationInputChangeHandler(() => {
+      const newPoint = PointModel.clone(this._point);
+      const destination = this._editPointComponent
         .getElement()
         .querySelector(`.event__input--destination`)
         .value;
       const currentMode = !_.isUndefined(point.isFavorite) ? Mode.EDIT : Mode.ADDING;
       const description = this._destinationsModel.getDestination(destination);
       newPoint.destination = description;
-      this._onDataChange(this, point, newPoint, currentMode, false);
+      this._dataChangeHandler(this, point, newPoint, currentMode, false);
     });
 
-    this._editEventComponent.setDeleteButtonClickHandler(() => {
-      this._editEventComponent.setData({
+    this._editPointComponent.setDeleteButtonClickHandler(() => {
+      this._editPointComponent.setData({
         DELETE: ButtonText.DELETING,
       });
-      const currentMode = !_.isUndefined(point.isFavorite) ? Mode.EDIT : Mode.ADDING;
-      this._onDataChange(this, point, null, currentMode);
+      const currentMode = !_.isUndefined(this._point.isFavorite) ? Mode.EDIT : Mode.ADDING;
+      this._dataChangeHandler(this, this._point, null, currentMode);
     });
 
     switch (mode) {
       case Mode.DEFAULT:
-        if (oldEventComponent && oldEditEventComponent) {
-          replace(this._eventComponent, oldEventComponent);
-          replace(this._editEventComponent, oldEditEventComponent);
-          this._replaceEditToEvent();
+        if (oldPointComponent && oldEditPointComponent) {
+          replace(this._pointComponent, oldPointComponent);
+          replace(this._editPointComponent, oldEditPointComponent);
+          this._replaceEditToPoint();
+          oldEditPointComponent.removeFlatPickrs();
         } else {
-          render(this._container, this._eventComponent, RenderPosition.BEFOREEND);
+          render(this._container, this._pointComponent, RenderPosition.BEFOREEND);
         }
         break;
       case Mode.EDIT:
-        if (oldEventComponent && oldEditEventComponent) {
-          replace(this._eventComponent, oldEventComponent);
-          replace(this._editEventComponent, oldEditEventComponent);
-          this._editEventComponent.applyFlatpickrs();
+        if (oldPointComponent && oldEditPointComponent) {
+          oldEditPointComponent.removeFlatPickrs();
+          this._editPointComponent.applyFlatpickrs();
+          replace(this._pointComponent, oldPointComponent);
+          replace(this._editPointComponent, oldEditPointComponent);
         } else {
-          render(this._container, this._editEventComponent, RenderPosition.BEFOREEND);
+          this._editPointComponent.applyFlatpickrs();
+          render(this._container, this._editPointComponent, RenderPosition.BEFOREEND);
         }
         break;
       case Mode.ADDING:
-        if (oldEditEventComponent && oldEventComponent) {
-          remove(oldEventComponent);
-          remove(oldEditEventComponent);
+        if (oldEditPointComponent && oldPointComponent) {
+          remove(oldPointComponent);
+          remove(oldEditPointComponent);
+          oldEditPointComponent.removeFlatPickrs();
         }
-        document.addEventListener(`keydown`, this._onEscKeyDown);
-        this._editEventComponent.applyFlatpickrs();
-        render(this._container, this._editEventComponent, RenderPosition.AFTERBEGIN);
+        document.addEventListener(`keydown`, this._escKeyDownHandler);
+        this._editPointComponent.applyFlatpickrs();
+        render(this._container, this._editPointComponent, RenderPosition.AFTERBEGIN);
         break;
     }
   }
 
   shake() {
-    this._editEventComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / MSECONDS_IN_SECOND}s`;
-    this._eventComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / MSECONDS_IN_SECOND}s`;
+    this._editPointComponent.addAnimation(`shake ${SHAKE_ANIMATION_TIMEOUT / TimeRatio.SECOND_IN_MILLISECONDS}s`);
+    this._pointComponent.addAnimation(`shake ${SHAKE_ANIMATION_TIMEOUT / TimeRatio.SECOND_IN_MILLISECONDS}s`);
     setTimeout(() => {
-      this._editEventComponent.getElement().style.animation = ``;
-      this._eventComponent.getElement().style.animation = ``;
+      this._editPointComponent.removeAnimation();
+      this._pointComponent.removeAnimation();
 
-      this._editEventComponent.setData({
+      this._editPointComponent.setData({
         SAVE: ButtonText.SAVE,
         DELETE: ButtonText.DELETE,
       });
@@ -206,36 +211,42 @@ export default class PointController {
 
   setDefaultView() {
     if (this._mode !== Mode.DEFAULT) {
-      this._replaceEditToEvent();
+      this._replaceEditToPoint();
     }
   }
 
   destroy() {
-    remove(this._eventComponent);
-    remove(this._editEventComponent);
-    document.removeEventListener(`keydown`, this._onEscKeyDown);
+    this._editPointComponent.removeFlatPickrs();
+    remove(this._pointComponent);
+    remove(this._editPointComponent);
+    document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
 
-  _replaceEditToEvent() {
+  _replaceEditToPoint() {
+    this._editPointComponent.removeFlatPickrs();
     if (this._mode === Mode.EDIT) {
-      this.render(this._onFormChange(this._point.id), Mode.DEFAULT);
+      this.render(this._formChangeHandler(this._point.id), Mode.DEFAULT);
     }
-    this._editEventComponent.removeFlatPickrs();
-    replace(this._eventComponent, this._editEventComponent);
+    document.removeEventListener(`keydown`, this._escKeyDownHandler);
+    replace(this._pointComponent, this._editPointComponent);
     this._mode = Mode.DEFAULT;
   }
 
-  _replaceEventToEdit() {
-    this._onViewChange();
-    replace(this._editEventComponent, this._eventComponent);
-    this._editEventComponent.applyFlatpickrs();
+  _replacePointToEdit() {
+    this._viewChangeHandler();
+    replace(this._editPointComponent, this._pointComponent);
+    this._editPointComponent.applyFlatpickrs();
     this._mode = Mode.EDIT;
   }
 
-  _onEscKeyDown(evt) {
+  _escKeyDownHandler(evt) {
     if (isEscKey(evt.key)) {
-      this._replaceEditToEvent();
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
+      if (this._mode === Mode.ADDING) {
+        this.destroy();
+        return;
+      }
+      this._replaceEditToPoint();
+      document.removeEventListener(`keydown`, this._escKeyDownHandler);
     }
   }
 }

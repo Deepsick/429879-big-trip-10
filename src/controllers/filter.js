@@ -9,22 +9,21 @@ export default class Filter {
     this._activeFilterType = FilterType.EVERYTHING;
     this._filterComponent = null;
 
-    this._onDataChange = this._onDataChange.bind(this);
-    this._onFilterChange = this._onFilterChange.bind(this);
+    this._dataChangeHandler = this._dataChangeHandler.bind(this);
+    this._filterChangeHandler = this._filterChangeHandler.bind(this);
 
-    this._pointsModel.setDataChangeHandler(this._onDataChange);
+    this._pointsModel.setDataChangeHandler(this._dataChangeHandler);
   }
 
   render() {
     const node = this._node;
     const oldComponent = this._filterComponent;
-
     const filters = Object.values(FilterType).map((filter) => ({
       name: filter,
       checked: filter === this._activeFilterType,
     }));
     this._filterComponent = new FiltersComponent(filters);
-    this._filterComponent.setFilterChangeHandler(this._onFilterChange);
+    this._filterComponent.setFilterChangeHandler(this._filterChangeHandler);
     if (oldComponent) {
       replace(this._filterComponent, oldComponent);
     } else {
@@ -32,12 +31,18 @@ export default class Filter {
     }
   }
 
-  _onFilterChange(filterType) {
+  _filterChangeHandler(filterType) {
     this._pointsModel.setFilter(filterType);
+    const filteredPoints = this._pointsModel.getPoints();
+    if (!filteredPoints.length) {
+      this._pointsModel.setFilter(this._activeFilterType);
+      return;
+    }
     this._activeFilterType = filterType;
+    this._filterComponent.setActiveItem(this._activeFilterType);
   }
 
-  _onDataChange() {
+  _dataChangeHandler() {
     this.render();
   }
 }

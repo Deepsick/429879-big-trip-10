@@ -65,12 +65,12 @@ const Api = class {
 
   sync(points) {
     return this._load({
-      url: `points/sync`,
+      route: `points/sync`,
       method: Method.POST,
       body: JSON.stringify(points),
       headers: new Headers({'Content-Type': `application/json`})
     })
-      .then((response) => response.json());
+    .then((response) => response.json());
   }
 
   _load({route, method = Method.GET, body = null, headers = new Headers()}) {

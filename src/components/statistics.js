@@ -30,7 +30,10 @@ const getDateByTypes = (types, points) => {
   return dataTypes;
 };
 
-const addEmojis = (types) => types.map((type) => `${Emoji[type]} ${type}`);
+const addEmojis = (types) => types.map((type) => {
+  const emoji = Emoji[type.split(`-`)[0].toUpperCase()];
+  return `${emoji} ${type}`;
+});
 
 const getMoneyByTypes = (dataItems) => dataItems.map((type) => type.sum);
 const getCountByTypes = (dataItems) => dataItems.map((type) => type.count);
@@ -315,6 +318,17 @@ export default class Statistics extends AbstractComponent {
     return createStatisticsTemplate();
   }
 
+  update() {
+    const oldElement = this.getElement();
+    const parent = oldElement.parentElement;
+    this.removeElement();
+
+    this._renderCharts();
+    const newElement = this.getElement();
+
+    parent.replaceChild(newElement, oldElement);
+  }
+
   _renderCharts() {
     const element = this.getElement();
 
@@ -348,16 +362,5 @@ export default class Statistics extends AbstractComponent {
       this._timeChart.destroy();
       this._timeChart = null;
     }
-  }
-
-  update() {
-    const oldElement = this.getElement();
-    const parent = oldElement.parentElement;
-    this.removeElement();
-
-    this._renderCharts();
-    const newElement = this.getElement();
-
-    parent.replaceChild(newElement, oldElement);
   }
 }

@@ -1,5 +1,5 @@
 import {ROUTE_SEPARATOR, ROUTE_REPLACER, ROUTE_COUNT} from '../const';
-import {getLastArrayElement} from '../utils/common';
+import {getLastElement} from '../utils/common';
 import {formatDateToDay} from '../utils/date';
 
 import AbstractComponent from './abstract-component';
@@ -20,7 +20,7 @@ const createRouteInfoTemplate = (date, route, price) => (
 const createDate = (points) => {
   if (points.length) {
     const dateFrom = formatDateToDay(points[0].dateFrom);
-    const dateTo = formatDateToDay(getLastArrayElement(points).dateTo);
+    const dateTo = formatDateToDay(getLastElement(points).dateTo);
 
     return `${dateFrom}&nbsp;${ROUTE_SEPARATOR}&nbsp;${dateTo}`;
   }
@@ -30,7 +30,7 @@ const createDate = (points) => {
 const createRoute = (points) => {
   if (points.length) {
     const firstDestination = points[0].destination.name;
-    const lastDestination = getLastArrayElement(points).destination.name;
+    const lastDestination = getLastElement(points).destination.name;
     const middleDestination = points.length <= ROUTE_COUNT ? points[1].destination.name : ROUTE_REPLACER;
 
     return `${firstDestination} ${ROUTE_SEPARATOR} ${middleDestination} ${ROUTE_SEPARATOR} ${lastDestination}`;
@@ -39,13 +39,16 @@ const createRoute = (points) => {
   return ``;
 };
 
-const getTotalPrice = (points) => {
+const getTotalPrice = (points, allOffers) => {
   let totalPrice = 0;
   points.forEach((point) => {
-    const {offers, price} = point;
+    const {offers, price, type} = point;
+    const availableOffers = allOffers.getTypeOffers(type);
+    const filteredOffers = availableOffers.offers.filter((availableOffer) => {
+      return offers.some((offer) => availableOffer.title === offer.title);
+    });
     totalPrice += +price;
-
-    offers.forEach((offer) => {
+    filteredOffers.forEach((offer) => {
       totalPrice += +offer.price;
     });
   });
@@ -54,12 +57,13 @@ const getTotalPrice = (points) => {
 };
 
 export default class RouteInfo extends AbstractComponent {
-  constructor(points) {
+  constructor(points, offers) {
     super();
     this._points = points;
+    this._offers = offers;
     this._route = createRoute(this._points);
     this._date = createDate(this._points);
-    this._totalPrice = getTotalPrice(this._points);
+    this._totalPrice = getTotalPrice(this._points, this._offers);
   }
 
   getTemplate() {
@@ -71,11 +75,10 @@ export default class RouteInfo extends AbstractComponent {
     const parent = oldElement.parentElement;
 
     this.removeElement();
-
     this._points = points;
     this._route = createRoute(this._points);
     this._date = createDate(this._points);
-    this._totalPrice = getTotalPrice(this._points);
+    this._totalPrice = getTotalPrice(this._points, this._offers);
     const newElement = this.getElement();
 
     parent.replaceChild(newElement, oldElement);

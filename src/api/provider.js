@@ -103,23 +103,21 @@ export default class Provider {
   sync() {
     if (this._isOnLine()) {
       const storedPoints = Object.values(this._pointsStore.getAll());
-
       return this._api.sync(storedPoints)
         .then((response) => {
           storedPoints.filter((point) => point.offline).forEach((point) => {
             this._pointsStore.removeItem(point.id);
           });
 
-          const createdPoints = getSyncedPoints(response.created);
+          const createdPoints = response.created;
           const updatedPoints = getSyncedPoints(response.updated);
-
           [...createdPoints, ...updatedPoints].forEach((point) => {
             this._pointsStore.setItem(point.id, point);
           });
 
           this._isSynchronized = true;
-
-          return Promise.resolve();
+          const storedSyncPoints = Object.values(this._pointsStore.getAll());
+          return Promise.resolve(Point.parsePoints(storedSyncPoints));
         });
     }
 

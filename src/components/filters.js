@@ -1,4 +1,4 @@
-import {FILTER_ID_PREFIX} from '../const';
+import {FILTER_ID_PREFIX, TagName} from '../const';
 import {formatToTitleCase} from '../utils/common';
 
 import AbstractComponent from './abstract-component';
@@ -41,10 +41,25 @@ export default class Filters extends AbstractComponent {
   setFilterChangeHandler(handler) {
     this
       .getElement()
-      .addEventListener(`change`, (evt) => {
-        const filterName = getFilterNameById(evt.target.id);
-        handler(filterName);
+      .addEventListener(`click`, (evt) => {
+        evt.preventDefault();;
+        if (evt.target.tagName.toLowerCase() === TagName.LABEL) {
+          const filterName = getFilterNameById(evt.target.htmlFor);
+          handler(filterName);
+        }
       });
+  }
+
+  setActiveItem(filterName) {
+    this
+    .getElement()
+    .querySelector(`input:checked`)
+    .checked = false;
+
+    this
+    .getElement()
+    .querySelector(`#filter-${filterName}`)
+    .checked = true;
   }
 }
 

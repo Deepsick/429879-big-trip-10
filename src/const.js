@@ -1,6 +1,8 @@
-const STORE_POINTS_PREFIX = `points-localstorage`;
-const STORE_DESTINATIONS_PREFIX = `destinations-localstorage`;
-const STORE_OFFERS_PREFIX = `offers-localstorage`;
+const StorePrefix = {
+  DESTINATIONS: `destinations-localstorage`,
+  OFFERS: `offers-localstorage`,
+  POINTS: `points-localstorage`,
+};
 const STORE_VER = `v1`;
 
 export const FilterType = {
@@ -42,16 +44,16 @@ export const MenuItem = {
 };
 
 export const Emoji = {
-  'taxi': `🚕`,
-  'bus': `🚌`,
-  'train': `🚂`,
-  'ship': `🚢`,
-  'transport': `🚆`,
-  'drive': `🚗`,
-  'flight': `✈️`,
-  'check-in': `🏨`,
-  'sightseeing': `🏛️`,
-  'restaurant': `🍴`,
+  TAXI: `🚕`,
+  BUS: `🚌`,
+  TRAIN: `🚂`,
+  SHIP: `🚢`,
+  TRANSPORT: `🚆`,
+  DRIVE: `🚗`,
+  FLIGHT: `✈️`,
+  CHECK: `🏨`,
+  SIGHTSEEING: `🏛️`,
+  RESTAURANT: `🍴`,
 };
 
 export const Method = {
@@ -67,12 +69,14 @@ export const Route = {
   OFFERS: `offers`,
 };
 
-export const AUTHORIZATION = `Basic weruqedjsh=`;
+export const AUTHORIZATION = `Basic asdddd;=`;
 export const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
 
-export const STORE_POINTS_NAME = `${STORE_POINTS_PREFIX}-${STORE_VER}`;
-export const STORE_DESTINATIONS_NAME = `${STORE_DESTINATIONS_PREFIX}-${STORE_VER}`;
-export const STORE_OFFERS_NAME = `${STORE_OFFERS_PREFIX}-${STORE_VER}`;
+export const StoreName = {
+  POINTS: `${StorePrefix.POINTS}-${STORE_VER}`,
+  DESTINATIONS: `${StorePrefix.DESTINATIONS}-${STORE_VER}`,
+  OFFERS: `${StorePrefix.OFFERS}-${STORE_VER}`,
+};
 
 export const FILTER_ID_PREFIX = `filter-`;
 export const ACTIVE_MENU_ITEM_CLASS = `trip-tabs__btn--active`;
@@ -119,4 +123,4 @@ export const ButtonText = {
 export const EVENT_COUNTER = 1;
 export const DEBOUNCE_TIMEOUT = 500;
 export const SHAKE_ANIMATION_TIMEOUT = 600;
-export const MSECONDS_IN_SECOND = 1000;
+export const CHECK_TYPE_PREFIX = `-in`;
